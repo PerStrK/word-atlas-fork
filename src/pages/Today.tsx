@@ -277,7 +277,10 @@ function LevelPath() {
     }
     return out;
   }, [atlas, cards]);
-  const NAMES = ["入门", "基础", "进阶", "中高", "高级", "精通", "提升", "巩固", "冲刺"];
+  const ORDINALS = "一二三四五六七八九";
+  const NAMES = atlas.cefr[0]?.startsWith("Unit")
+    ? atlas.cefr.map((_, i) => (i < 9 ? `第${ORDINALS[i]}单元` : `第${i + 1}单元`))
+    : ["入门", "基础", "进阶", "中高", "高级", "精通", "提升", "巩固", "冲刺"];
   return (
     <section className="panel path-panel">
       <div className="panel-head">

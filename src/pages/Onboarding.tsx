@@ -3,15 +3,23 @@ import { useState } from "react";
 import { useAtlas } from "../atlas/context";
 import { store } from "../store/store";
 
-const LEVELS = [
+const LEVELS_IELTS = [
   ["A2", "基础", "日常词还不太稳"],
   ["B1", "进阶", "目标 5.5 – 6 分"],
   ["B2", "中高", "目标 6.5 – 7 分"],
   ["C1", "高级", "冲刺 7.5 分以上"],
 ];
 
+const LEVELS_UNITS = [
+  ["Unit 1", "第一单元", "从头开始"],
+  ["Unit 2", "第二单元", "第一单元已学完"],
+  ["Unit 3", "第三单元", "前两单元已学完"],
+  ["Unit 5", "第五单元", "前四单元已学完"],
+];
+
 export function Onboarding() {
   const atlas = useAtlas();
+  const LEVELS = atlas.cefr[0]?.startsWith("Unit") ? LEVELS_UNITS : LEVELS_IELTS;
   const [level, setLevel] = useState(1);
   const [goal, setGoal] = useState(10);
   const finish = () => store.settings({ onboarded: true, startLevel: atlas.cefr.indexOf(LEVELS[level][0]), dailyNew: goal });
@@ -51,7 +59,7 @@ export function Onboarding() {
           <button className="btn btn-primary btn-xl" onClick={finish}>
             出发 <ArrowRight size={20} />
           </button>
-          <p className="muted">不用注册。进度只留在这台设备上，随时可以在「我的」里修改。</p>
+          <p className="muted">进度会自动保存在本机；登录账号后还能同步到其他设备，随时可以在「我的」里修改。</p>
         </div>
       </div>
     </div>
