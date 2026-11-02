@@ -260,8 +260,25 @@ function WordSheetInner({ id }: { id: string | null }) {
     window.addEventListener("keydown", on);
     return () => window.removeEventListener("keydown", on);
   }, [id, neighbor]);
+  // 左右滑动翻页：左滑下一个、右滑上一个（与底部按钮、方向键共用 neighbor）
+  const touchAt = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchAt.current = t ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchAt.current;
+    touchAt.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    if (!t) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy) * 1.6) neighbor(dx < 0 ? 1 : -1);
+  };
   return (
     <Sheet open={!!id} onClose={closeWord} label={ref ? `${ref.word} 词条` : "词条"} wide>
+      <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {entry ? (
         <EntryView key={entry.id} entry={entry} />
       ) : error ? (
@@ -282,6 +299,7 @@ function WordSheetInner({ id }: { id: string | null }) {
           </button>
         </nav>
       )}
+      </div>
     </Sheet>
   );
 }

@@ -39,7 +39,7 @@
   --r-xl: 32px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
-  --top: 68px;
+  --top: calc(68px + env(safe-area-inset-top, 0px));
   --tab: 0px;
   --gutter: 20px;
   color-scheme: light;
@@ -561,6 +561,7 @@ code {
   align-items: center;
   gap: 16px;
   padding: 0 max(var(--gutter), calc((100vw - 1200px) / 2 + var(--gutter)));
+  padding-top: env(safe-area-inset-top, 0px);
   background: color-mix(in oklab, var(--paper) 82%, transparent);
   backdrop-filter: saturate(1.4) blur(16px);
   -webkit-backdrop-filter: saturate(1.4) blur(16px);
@@ -2234,7 +2235,7 @@ code {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px max(var(--gutter), calc((100vw - 980px) / 2));
+  padding: calc(12px + env(safe-area-inset-top, 0px)) max(var(--gutter), calc((100vw - 980px) / 2)) 12px;
   background: color-mix(in oklab, var(--paper) 88%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
