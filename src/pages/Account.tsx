@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { apiGet, apiPost, auth, login, logout, register, useAuth } from "../lib/auth";
+import { datasetStages, useDatasets, type DatasetInfo, type DatasetStages } from "../lib/datasets";
 import { syncAfterLogin, syncNow } from "../lib/sync";
 import { toast } from "../ui/Toast";
 
@@ -114,19 +115,38 @@ interface AdminUser {
   disabled: boolean;
   cards: number;
   units: number;
+  stages: Record<string, number>;
 }
 
-function UnitSetter({ username, units, total, onDone }: { username: string; units: number; total: number; onDone: () => void }) {
-  const [n, setN] = useState(units);
+function StageSetter({
+  username,
+  info,
+  stages,
+  value,
+  onDone,
+}: {
+  username: string;
+  info: DatasetInfo;
+  stages: DatasetStages | null;
+  value: number;
+  onDone: () => void;
+}) {
+  const [n, setN] = useState(value);
   const [busy, setBusy] = useState(false);
   useEffect(() => {
-    setN(units);
-  }, [units]);
+    setN(value);
+  }, [value, info.id]);
+  const names = stages?.names ?? [];
+  const isUnit = names.length > 0 && names[0].startsWith("Unit");
   const apply = async () => {
     setBusy(true);
     try {
-      const d = await apiPost("/admin/progress", { username, units: n });
-      toast(`已把「${username}」设为学完 ${n} 个单元（共 ${d.cards} 个词）`);
+      const d = await apiPost("/admin/progress", { username, dataset: info.id, stages: n });
+      toast(
+        isUnit
+          ? `已把「${username}」在${info.name}设为学完 ${n} 个单元（共享池共 ${d.cards} 词）`
+          : `已把「${username}」在${info.name}的进度设到 ${n === 0 ? "未开始" : names[n - 1]}（共享池共 ${d.cards} 词）`,
+      );
       onDone();
     } catch (e) {
       toast(e instanceof Error ? e.message : "设置失败", "warn");
@@ -134,18 +154,19 @@ function UnitSetter({ username, units, total, onDone }: { username: string; unit
       setBusy(false);
     }
   };
+  if (!stages || names.length === 0) return null;
   return (
     <div className="acct-row admin-progress">
-      <span className="muted">调整进度：已学完</span>
+      <span className="muted">{isUnit ? "调整进度：已学完" : "调整进度：已学到"}</span>
       <select value={n} onChange={(e) => setN(Number(e.target.value))} disabled={busy}>
-        {Array.from({ length: total + 1 }, (_, i) => (
+        {Array.from({ length: names.length + 1 }, (_, i) => (
           <option key={i} value={i}>
-            {i}
+            {isUnit ? i : i === 0 ? "未开始" : names[i - 1]}
           </option>
         ))}
       </select>
-      <span className="muted">个单元</span>
-      <button className="btn btn-ghost" disabled={busy || n === units} onClick={() => void apply()}>
+      {isUnit && <span className="muted">个单元</span>}
+      <button className="btn btn-ghost" disabled={busy || n === value} onClick={() => void apply()}>
         设定进度
       </button>
     </div>
@@ -154,15 +175,30 @@ function UnitSetter({ username, units, total, onDone }: { username: string; unit
 
 export function AdminPanel() {
   const { user, registerOpen } = useAuth();
+  const { list, active } = useDatasets();
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [unitTotal, setUnitTotal] = useState(9);
+  const [adjId, setAdjId] = useState("");
+  const [stageMap, setStageMap] = useState<Record<string, DatasetStages>>({});
   const [busy, setBusy] = useState(false);
+
+  const adjInfo = list.find((d) => d.id === (adjId || active)) ?? list[0];
+
+  useEffect(() => {
+    let live = true;
+    void (async () => {
+      const out: Record<string, DatasetStages> = {};
+      for (const d of list) out[d.id] = await datasetStages(d);
+      if (live) setStageMap(out);
+    })();
+    return () => {
+      live = false;
+    };
+  }, [list]);
 
   const load = useCallback(async () => {
     try {
       const d = await apiGet("/admin/users");
       setUsers(d.users as AdminUser[]);
-      if (typeof d.unitTotal === "number") setUnitTotal(d.unitTotal);
     } catch {
       /* not admin or offline */
     }
@@ -219,6 +255,23 @@ export function AdminPanel() {
           <span className="switch" aria-hidden="true" />
         </label>
         <p className="muted">关闭后，新用户不能再自助注册账号（已有账号不受影响）。</p>
+        {adjInfo && (
+          <>
+            <div className="acct-row">
+              <span className="muted">调整进度针对词库：</span>
+              <select value={adjInfo.id} onChange={(e) => setAdjId(e.target.value)}>
+                {list.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="muted">
+              已学词是全词库共享的一份记录，这里按所选词库的阶段（单元 / 等级）设定；把某个词库调低时，被其他词库已完成阶段覆盖的词会保留。
+            </p>
+          </>
+        )}
         <div className="admin-users">
           {users.map((u) => (
             <Fragment key={u.username}>
@@ -228,7 +281,23 @@ export function AdminPanel() {
                   {u.role === "admin" && <span className="acct-badge">管理员</span>}
                   {u.disabled && <span className="acct-badge is-off">已停用</span>}
                   <small className="muted">
-                    已学 {u.cards} 词 · 已学完 {u.units} 单元
+                    已学 {u.cards} 词
+                    {list.map((d) => {
+                      const st = stageMap[d.id];
+                      if (!st || st.names.length === 0) return null;
+                      const v = u.stages?.[d.id] ?? 0;
+                      const label = st.names[0].startsWith("Unit")
+                        ? `${v} 单元`
+                        : v === 0
+                          ? "未开始"
+                          : st.names[v - 1];
+                      return (
+                        <span key={d.id}>
+                          {" · "}
+                          {d.name} {label}
+                        </span>
+                      );
+                    })}
                   </small>
                 </div>
                 {u.username !== user.username && (
@@ -251,7 +320,15 @@ export function AdminPanel() {
                   </div>
                 )}
               </div>
-              <UnitSetter username={u.username} units={u.units} total={unitTotal} onDone={() => void load()} />
+              {adjInfo && (
+                <StageSetter
+                  username={u.username}
+                  info={adjInfo}
+                  stages={stageMap[adjInfo.id] ?? null}
+                  value={u.stages?.[adjInfo.id] ?? 0}
+                  onDone={() => void load()}
+                />
+              )}
             </Fragment>
           ))}
         </div>

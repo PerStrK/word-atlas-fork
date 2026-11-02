@@ -91,6 +91,46 @@ def completed_units(cards: dict) -> int:
     return n
 
 
+# Stage maps for EVERY dataset in the manifest: a dataset's "stages" are the
+# bands of its index file (PEP: Unit 1..9; IELTS: A1..C2), keyed by word.
+STAGE_ORDER: dict = {}
+STAGE_KEYS: dict = {}
+STAGE_ALL: dict = {}
+
+
+def load_stages():
+    global STAGE_ORDER, STAGE_KEYS, STAGE_ALL
+    order, keys, allk = {}, {}, {}
+    for d in manifest_datasets():
+        try:
+            idx_path = WEBROOT.joinpath(*d["root"].split("/")) / "index.json"
+            idx = json.loads(idx_path.read_text(encoding="utf-8"))
+            fi = idx["fields"].index("cefr")
+            wi = idx["fields"].index("word")
+            names = list(idx["cefr"])
+            km = {nm: set() for nm in names}
+            for w in idx["words"]:
+                km[names[w[fi]]].add(word_key(w[wi]))
+            order[d["id"]] = names
+            keys[d["id"]] = km
+            allk[d["id"]] = set().union(*km.values()) if km else set()
+            print(f"stages loaded {d['id']}: {[(nm, len(km[nm])) for nm in names]}", flush=True)
+        except Exception as e:
+            print(f"stage load failed for {d['id']}: {e}", flush=True)
+    STAGE_ORDER, STAGE_KEYS, STAGE_ALL = order, keys, allk
+
+
+def completed_stages(ds: str, cards: dict) -> int:
+    n = 0
+    for nm in STAGE_ORDER.get(ds, []):
+        ks = STAGE_KEYS.get(ds, {}).get(nm, set())
+        if ks and all(k in cards for k in ks):
+            n += 1
+        else:
+            break
+    return n
+
+
 def manifest_datasets():
     """Dataset manifest: edit datasets.json next to this file to add a library."""
     try:
@@ -325,18 +365,21 @@ class H(BaseHTTPRequestHandler):
             for r in users:
                 cards = 0
                 units = 0
+                stages = {}
                 for pr in conn.execute("SELECT dataset, data FROM progress WHERE username = ?", (r["username"],)):
                     try:
                         pcards = json.loads(pr["data"]).get("cards") or {}
                         if pr["dataset"] == GLOBAL_DATASET:
                             cards = len(pcards)
                             units = completed_units(pcards)
+                            stages = {ds: completed_stages(ds, pcards) for ds in STAGE_ORDER}
                     except Exception:
                         pass
                 out.append({"username": r["username"], "role": r["role"], "disabled": bool(r["disabled"]),
-                            "created_at": r["created_at"], "cards": cards, "units": units})
+                            "created_at": r["created_at"], "cards": cards, "units": units, "stages": stages})
             conn.close()
-            return self._send(200, {"users": out, "unitTotal": len(UNIT_ORDER)})
+            return self._send(200, {"users": out, "unitTotal": len(UNIT_ORDER),
+                                    "stageTotals": {ds: len(v) for ds, v in STAGE_ORDER.items()}})
         return self._send(404, {"error": "接口不存在。"})
 
     def do_POST(self):
@@ -402,11 +445,14 @@ class H(BaseHTTPRequestHandler):
                 return
             body = self._body() or {}
             username = str(body.get("username") or "").strip()
+            ds = str(body.get("dataset") or DATASET_ID)
+            if ds not in STAGE_ORDER:
+                return self._send(400, {"error": "词库不存在。"})
             try:
-                units = int(body.get("units"))
+                units = int(body.get("stages", body.get("units")))
             except Exception:
-                return self._send(400, {"error": "单元数不正确。"})
-            units = max(0, min(units, len(UNIT_ORDER)))
+                return self._send(400, {"error": "阶段数不正确。"})
+            units = max(0, min(units, len(STAGE_ORDER[ds])))
             conn = db()
             row = conn.execute("SELECT 1 FROM users WHERE username = ?", (username,)).fetchone()
             if not row:
@@ -424,13 +470,24 @@ class H(BaseHTTPRequestHandler):
             if not isinstance(progress, dict) or progress.get("version") != 2:
                 progress = {"version": 2, "datasetId": GLOBAL_DATASET, "cards": {}, "bookmarks": [],
                             "days": {}, "typing": [], "session": None, "mistakes": []}
+            cur_cards = progress.get("cards") or {}
             keep = set()
-            for u in UNIT_ORDER[:units]:
-                keep.update(UNIT_KEYS.get(u, set()))
+            for nm in STAGE_ORDER[ds][:units]:
+                keep.update(STAGE_KEYS[ds].get(nm, set()))
+            # Words covered by stages this account has completed in OTHER
+            # datasets are protected: dialling this dataset back must not
+            # strip progress that belongs to another dataset's stages.
+            protected = set()
+            for other, onames in STAGE_ORDER.items():
+                if other == ds:
+                    continue
+                for nm in onames[:completed_stages(other, cur_cards)]:
+                    protected.update(STAGE_KEYS[other].get(nm, set()))
+            allk = STAGE_ALL.get(ds, set())
             now = int(time.time() * 1000)
             new_cards = {}
-            for key, card in (progress.get("cards") or {}).items():
-                if key in keep or key not in ALL_KEYS:
+            for key, card in cur_cards.items():
+                if key in keep or key not in allk or key in protected:
                     new_cards[key] = card
             for key in keep:
                 if key not in new_cards:
@@ -441,7 +498,8 @@ class H(BaseHTTPRequestHandler):
                          (username, GLOBAL_DATASET, json.dumps(progress, ensure_ascii=False), now, now))
             conn.commit()
             conn.close()
-            return self._send(200, {"ok": True, "cards": len(new_cards), "units": units})
+            return self._send(200, {"ok": True, "cards": len(new_cards), "units": units,
+                                    "stages": units, "dataset": ds})
         if path == "/api/admin/user":
             admin = self._require_admin()
             if not admin:
@@ -525,5 +583,6 @@ class H(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     init_db()
     load_units()
+    load_stages()
     print(f"word-atlas server on 0.0.0.0:{PORT}, db={DB_PATH}, webroot={WEBROOT}", flush=True)
     ThreadingHTTPServer(("0.0.0.0", PORT), H).serve_forever()

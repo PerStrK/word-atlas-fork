@@ -131,8 +131,7 @@ export function setActive(id: string) {
 const keyCache = new Map<string, Promise<Set<string>>>();
 
 /** Word keys (normalized words) of a dataset, from its index file; cached. */
-export function datasetWordKeys(info: DatasetInfo): Promise<Set<string>> {
-  let p = keyCache.get(info.id);
+export function datasetWordKeys(info: DatasetInfo): Promise<Set<string>> {  let p = keyCache.get(info.id);
   if (!p) {
     p = (async () => {
       const out = new Set<string>();
@@ -151,6 +150,42 @@ export function datasetWordKeys(info: DatasetInfo): Promise<Set<string>> {
       return out;
     })();
     keyCache.set(info.id, p);
+  }
+  return p;
+}
+
+export interface DatasetStages {
+  /** Stage names in order (PEP: "Unit 1"…; IELTS: "A1"…). */
+  names: string[];
+  counts: number[];
+}
+
+const stageCache = new Map<string, Promise<DatasetStages>>();
+
+/** Stage names + per-stage word counts of a dataset, from its index file; cached. */
+export function datasetStages(info: DatasetInfo): Promise<DatasetStages> {
+  let p = stageCache.get(info.id);
+  if (!p) {
+    p = (async () => {
+      try {
+        const r = await fetch(`${import.meta.env.BASE_URL}${info.root}/index.json`);
+        if (r.ok) {
+          const idx = (await r.json()) as { fields?: string[]; cefr?: string[]; words?: unknown[][] };
+          const names = idx.cefr ?? [];
+          const counts = names.map(() => 0);
+          const fi = idx.fields?.indexOf("cefr") ?? 4;
+          for (const row of idx.words ?? []) {
+            const ci = (row as unknown[])[fi];
+            if (typeof ci === "number" && counts[ci] !== undefined) counts[ci]++;
+          }
+          return { names, counts };
+        }
+      } catch {
+        /* fall through */
+      }
+      return { names: [], counts: [] };
+    })();
+    stageCache.set(info.id, p);
   }
   return p;
 }
