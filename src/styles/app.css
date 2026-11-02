@@ -3422,23 +3422,23 @@ code {
   height: 1px;
   background: var(--line-strong);
 }
-.mark-needle {
-  transform-origin: 16px 16px;
+.mark-hero {
+  transform-origin: 14.4px 25.5px;
   transition: transform 0.9s var(--spring);
 }
-a:hover .mark-needle,
-.boot .mark-needle {
-  transform: rotate(35deg);
+a:hover .mark-hero,
+.boot .mark-hero {
+  transform: scale(1.22);
 }
-.boot .mark-needle {
-  animation: seek 2.4s var(--ease) infinite alternate;
+.boot .mark-hero {
+  animation: twinkle 2.4s var(--ease) infinite alternate;
 }
-@keyframes seek {
+@keyframes twinkle {
   from {
-    transform: rotate(-25deg);
+    transform: scale(1);
   }
   to {
-    transform: rotate(30deg);
+    transform: scale(1.3);
   }
 }
 
