@@ -1,5 +1,5 @@
 import { Bookmark, BookmarkCheck, Lightbulb, Share2 } from "lucide-react";
-import type { Entry, WordRef } from "../atlas/types";
+import type { AudioKind, Entry, WordRef } from "../atlas/types";
 import { useAtlas } from "../atlas/context";
 import { splitHighlight, splitPair, wordKey } from "../lib/text";
 import { formatInterval, isMastered } from "../store/srs";
@@ -24,11 +24,13 @@ export function Highlight({ text, word }: { text: string; word: string }) {
 export function Pronounce({ entry, refw }: { entry: Entry; refw: WordRef | Entry }) {
   const atlas = useAtlas();
   const accent = useStore((s) => s.settings.accent);
-  const both = entry.uk && entry.us && entry.uk !== entry.us;
-  const items: ["uk" | "us", string, string][] = both
-    ? [["uk", "英", entry.uk], ["us", "美", entry.us]]
-    : [[accent, accent === "uk" ? "英" : "美", entry.uk || entry.us]];
-  if (!both && items[0][2] === "") return null;
+  // Both accents are always offered when both recordings exist, even when
+  // the two IPAs are written identically — the sounds still differ.
+  const items: ["uk" | "us", string, string][] = [];
+  if (atlas.audio(refw, "uk") || entry.uk) items.push(["uk", "英", entry.uk]);
+  if (atlas.audio(refw, "us") || entry.us) items.push(["us", "美", entry.us]);
+  if (!items.length) items.push([accent, accent === "uk" ? "英" : "美", entry.uk || entry.us]);
+  if (items.length === 1 && items[0][2] === "") return null;
   return (
     <div className="pron">
       {(accent === "us" ? [...items].reverse() : items).map(([acc, label, ipa]) => (
@@ -58,7 +60,11 @@ export function EntryView({ entry, mode = "detail", eager = true }: { entry: Ent
   const accent = useStore((s) => s.settings.accent);
   const topicIdx = atlas.topics.findIndex((t) => t[0] === entry.topic);
   const topic = atlas.topics[topicIdx];
-  const exUrls = [atlas.audio(entry, "ex"), atlas.audio(entry, "ex2")];
+  // Example readings follow the accent chosen in settings when a per-accent
+  // recording exists; otherwise the legacy single recording is used.
+  const exUrls = [0, 1].map(
+    (i) => atlas.audio(entry, ((i ? "ex2" : "ex") + accent) as AudioKind) ?? atlas.audio(entry, i ? "ex2" : "ex"),
+  );
   const famLinks = entry.fam.map((f) => {
     const w = f.replace(/\s*\(.*\)\s*$/, "").trim().toLowerCase();
     const hit = atlas.words.find((x) => x.word.toLowerCase() === w);
@@ -124,7 +130,7 @@ export function EntryView({ entry, mode = "detail", eager = true }: { entry: Ent
                   {entry.ex.length > 1 && <span className={`ex-tag ${i ? "is-ielts" : ""}`}>{i ? "拓展例句" : "日常"}</span>}
                   <p className="ex-en" lang="en">
                     <Highlight text={x.en} word={entry.w} />
-                    <Speak url={exUrls[i] ?? null} text={x.en} accent={i === 1 && exUrls[1] ? "us" : accent} size="sm" className="ex-speak" />
+                    <Speak url={exUrls[i] ?? null} text={x.en} accent={accent} size="sm" className="ex-speak" />
                   </p>
                   <p className="ex-zh">{x.zh}</p>
                 </li>

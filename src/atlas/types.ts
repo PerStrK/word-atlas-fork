@@ -33,10 +33,14 @@ export interface Entry {
   /** Media bit flags, see MEDIA. */
   m: number;
   /** Absolute media URLs for datasets that do not follow the atlas layout. */
-  media?: { img?: string | null; uk?: string | null; us?: string | null; ex?: string | null; ex2?: string | null };
+  media?: { img?: string | null; uk?: string | null; us?: string | null; ex?: string | null; ex2?: string | null; exuk?: string | null; exus?: string | null; ex2uk?: string | null; ex2us?: string | null };
 }
 
-export const MEDIA = { img: 1, uk: 2, us: 4, ex: 8, ex2: 16 } as const;
+export const MEDIA = { img: 1, uk: 2, us: 4, ex: 8, ex2: 16, exuk: 32, exus: 64, ex2uk: 128, ex2us: 256 } as const;
+
+/** Audio kinds an atlas can resolve: word accents, legacy single-accent
+ *  example tracks, and per-accent example tracks. */
+export type AudioKind = "uk" | "us" | "ex" | "ex2" | "exuk" | "exus" | "ex2uk" | "ex2us";
 
 export interface WordRef {
   id: string;
@@ -68,5 +72,5 @@ export interface Atlas {
   entry: (id: string) => Promise<Entry>;
   peek: (id: string) => Entry | undefined;
   img: (ref: WordRef | Entry, size?: "thumb" | "full") => string | null;
-  audio: (ref: WordRef | Entry, kind: "uk" | "us" | "ex" | "ex2") => string | null;
+  audio: (ref: WordRef | Entry, kind: AudioKind) => string | null;
 }

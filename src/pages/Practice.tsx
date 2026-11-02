@@ -1,7 +1,7 @@
 import { Headphones, Keyboard, RotateCcw, Type } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { prefetch, useAtlas } from "../atlas/context";
-import type { Entry } from "../atlas/types";
+import type { AudioKind, Entry } from "../atlas/types";
 import { play, stopAudio } from "../lib/audio";
 import { cue } from "../lib/sound";
 import { hashSeed, shuffle, wordKey } from "../lib/text";
@@ -135,7 +135,7 @@ function TypingRound({ mode, entries, onExit, onAgain }: { mode: Mode; entries: 
     setValue("");
     started.current = null;
     input.current?.focus();
-    if (mode === "dictation") void play(atlas.audio(e, "ex"), e.ex[0].en, settings.accent);
+    if (mode === "dictation") void play(atlas.audio(e, ("ex" + settings.accent) as AudioKind) ?? atlas.audio(e, "ex"), e.ex[0].en, settings.accent);
     if (mode === "word" && settings.autoplay) void play(atlas.audio(e, settings.accent), e.w, settings.accent);
   }, [i]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => stopAudio(), []);
@@ -218,7 +218,7 @@ function TypingRound({ mode, entries, onExit, onAgain }: { mode: Mode; entries: 
         {mode !== "word" && (
           <p className="typing-zh">
             {mode === "dictation" && (
-              <button className="link" onClick={() => play(atlas.audio(e, "ex"), e.ex[0].en, settings.accent)}>
+              <button className="link" onClick={() => play(atlas.audio(e, ("ex" + settings.accent) as AudioKind) ?? atlas.audio(e, "ex"), e.ex[0].en, settings.accent)}>
                 再听一遍
               </button>
             )}
