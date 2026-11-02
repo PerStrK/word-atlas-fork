@@ -2,7 +2,6 @@ import type { Atlas, Entry, IndexRow, WordRef } from "./types";
 import { MEDIA } from "./types";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-const url = (p: string) => `${BASE}/atlas/${p}`;
 
 interface IndexFile {
   id: string;
@@ -16,7 +15,8 @@ interface IndexFile {
   words: IndexRow[];
 }
 
-export async function loadOpenAtlas(): Promise<Atlas> {
+export async function loadAtlas(root: string): Promise<Atlas> {
+  const url = (p: string) => `${BASE}/${root}/${p}`;
   const res = await fetch(url("index.json"));
   if (!res.ok) throw new Error(`词库索引加载失败（${res.status}）`);
   const idx = (await res.json()) as IndexFile;
@@ -85,6 +85,8 @@ export async function loadOpenAtlas(): Promise<Atlas> {
     },
   };
 }
+
+export const loadOpenAtlas = () => loadAtlas("atlas");
 
 /** Rows from the legacy private catalog served only by the local dev server. */
 interface PrivateWord {

@@ -4,9 +4,11 @@ import { useAtlas } from "../atlas/context";
 import { isMastered } from "../store/srs";
 import { dayKey, exportBackup, importBackup, resetProgress, store, useStore, type Settings } from "../store/store";
 import { toast } from "../ui/Toast";
+import { AccountPanel, AdminPanel } from "./Account";
+import { DatasetsPanel } from "./Datasets";
 import { streakOf } from "./Today";
 
-export function Me({ privateAvailable }: { privateAvailable: boolean }) {
+export function Me() {
   const atlas = useAtlas();
   const progress = useStore((s) => s.progress);
   const settings = useStore((s) => s.settings);
@@ -88,6 +90,9 @@ export function Me({ privateAvailable }: { privateAvailable: boolean }) {
       </section>
 
       <div className="me-grid">
+        <AccountPanel />
+        <AdminPanel />
+        <DatasetsPanel />
         <section className="panel">
           <h3 className="eyebrow">过去 20 周</h3>
           <Heatmap days={progress.days} />
@@ -118,7 +123,7 @@ export function Me({ privateAvailable }: { privateAvailable: boolean }) {
               ))}
             </div>
           </Field>
-          <Field label="从哪个难度开始" hint="跳过已经熟悉的低级别词。">
+          <Field label={atlas.cefr[0]?.startsWith("Unit") ? "从哪个单元开始" : "从哪个难度开始"} hint={atlas.cefr[0]?.startsWith("Unit") ? "跳过前面已经学过的单元。" : "跳过已经熟悉的低级别词。"}>
             <div className="segmented">
               {atlas.cefr.map((l, i) => (
                 <button key={l} className={settings.startLevel === i ? "is-on" : ""} onClick={() => set({ startLevel: i })}>
@@ -165,23 +170,11 @@ export function Me({ privateAvailable }: { privateAvailable: boolean }) {
           <Toggle label="界面音效" on={settings.sfx} set={(v) => set({ sfx: v })} />
           <Toggle label="开屏动画（每天一次）" on={settings.splash} set={(v) => set({ splash: v })} />
           <Toggle label="复习时加入拼写题" on={settings.spell} set={(v) => set({ spell: v })} />
-          {privateAvailable && (
-            <Field label="词库" hint="私人词库只在本机开发服务器中可用，不会被打包发布。">
-              <div className="segmented">
-                <button className={settings.dataset === "open" ? "is-on" : ""} onClick={() => set({ dataset: "open" })}>
-                  开放图鉴
-                </button>
-                <button className={settings.dataset === "private" ? "is-on" : ""} onClick={() => set({ dataset: "private" })}>
-                  私人 8000
-                </button>
-              </div>
-            </Field>
-          )}
         </section>
 
         <section className="panel">
           <h3 className="eyebrow">数据</h3>
-          <p className="muted">进度只存在这台设备的浏览器里：没有账号，没有服务器。换设备时，导出备份再导入即可。</p>
+          <p className="muted">登录账号后，进度自动同步到服务器，换设备登录同一账号即可继续；不登录时，进度只存在这台设备的浏览器里。也可以用下面的导出/导入备份手动迁移。</p>
           {saveError && <p className="warn-text">浏览器拒绝保存（可能是隐私模式或空间已满）。请尽快导出备份。</p>}
           <div className="data-actions">
             <button className="btn btn-ghost" onClick={download}>

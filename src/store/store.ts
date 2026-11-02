@@ -248,6 +248,13 @@ export const store = {
     loadedId = datasetId;
     emit();
   },
+  /** Replace local progress with a server copy (cloud sync). */
+  adoptProgress(p: Progress) {
+    state = { ...state, progress: sanitizeProgress(p, state.progress.datasetId) };
+    emit();
+    markDirty();
+    flush();
+  },
   progress(fn: (p: Progress) => Progress) {
     state = { ...state, progress: fn(state.progress) };
     emit();

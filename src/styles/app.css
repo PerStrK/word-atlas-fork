@@ -4120,3 +4120,19 @@ a:hover .mark-needle,
 .streak-panel .mini-stats div:first-child dd {
   color: var(--ochre);
 }
+
+/* account & sync (PEP G7 edition) */
+.acct-body { display: grid; gap: 10px; margin-top: 6px; }
+.acct-form { display: grid; gap: 10px; }
+.acct-form input { width: 100%; }
+.acct-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.acct-badge { margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 12px; background: #2563eb; color: #fff; vertical-align: 2px; }
+.acct-badge.is-off { background: #9ca3af; }
+.admin-users { display: grid; gap: 4px; margin-top: 4px; }
+.admin-user { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid rgba(127, 127, 127, 0.18); }
+.admin-user small { margin-left: 8px; }
+
+.admin-progress { padding: 2px 0 10px; }
+.admin-progress select { padding: 5px 8px; border-radius: 8px; font: inherit; }
+
+.acct-check { display: inline-flex; align-items: center; gap: 6px; }

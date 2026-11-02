@@ -1,7 +1,7 @@
 import { BookOpen, ChevronLeft, ChevronRight, Compass, Github, Keyboard, Moon, Search, Sun, User } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AtlasContext, useAtlas, useEntry } from "./atlas/context";
-import { loadOpenAtlas, loadPrivateAtlas } from "./atlas/data";
+import { loadAtlas } from "./atlas/data";
 import type { Atlas } from "./atlas/types";
 import { REPO_URL } from "./config";
 import { closeWord, currentLocation, go, openWord, useLocation, type Route } from "./lib/router";
@@ -14,13 +14,15 @@ import { Practice } from "./pages/Practice";
 import { Today } from "./pages/Today";
 import { cue } from "./lib/sound";
 import { store, useStore } from "./store/store";
+import { initSync, syncDataset } from "./lib/sync";
+import { datasetById, initDatasets, useDatasets } from "./lib/datasets";
 import { EntryView } from "./ui/EntryView";
 import { AmbienceController, AmbiencePicker } from "./ui/Ambience";
 import { Logo } from "./ui/Logo";
 import { Palette } from "./ui/Palette";
 import { Sheet } from "./ui/Sheet";
 import { shouldShowSplash, Splash } from "./ui/Splash";
-import { Toasts } from "./ui/Toast";
+import { toast, Toasts } from "./ui/Toast";
 
 const NAV: { page: Route["page"]; label: string; icon: typeof Compass }[] = [
   { page: "today", label: "今日", icon: Compass },
@@ -43,29 +45,38 @@ function useTheme() {
 
 export default function App() {
   const [atlas, setAtlas] = useState<Atlas | null>(null);
-  const [open, setOpen] = useState<Atlas | null>(null);
-  const [priv, setPriv] = useState<Atlas | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const dataset = useStore((s) => s.settings.dataset);
+  const atlasRef = useRef<Atlas | null>(null);
+  const { active, ready } = useDatasets();
   useTheme();
 
   useEffect(() => {
-    loadOpenAtlas().then(
-      (a) => {
-        setOpen(a);
-        if (import.meta.env.DEV) loadPrivateAtlas(a).then(setPriv, () => null);
-      },
-      (e: Error) => setError(e.message),
-    );
+    void initDatasets();
   }, []);
 
   useEffect(() => {
-    const next = dataset === "private" && priv ? priv : open;
-    if (next && next !== atlas) {
-      store.useDataset(next.id);
-      setAtlas(next);
-    }
-  }, [dataset, open, priv, atlas]);
+    if (!ready) return;
+    const info = datasetById(active);
+    if (!info) return;
+    let cancelled = false;
+    loadAtlas(info.root).then(
+      (a) => {
+        if (cancelled) return;
+        atlasRef.current = a;
+        store.useDataset(a.id);
+        setAtlas(a);
+        void syncDataset(a.id);
+      },
+      (e: Error) => {
+        if (cancelled) return;
+        if (!atlasRef.current) setError(e.message);
+        else toast(`词库「${info.name}」加载失败，已保留当前词库。`, "warn");
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [active, ready]);
 
   if (error)
     return (
@@ -86,16 +97,19 @@ export default function App() {
     );
   return (
     <AtlasContext.Provider value={atlas}>
-      <Shell privateAvailable={!!priv} />
+      <Shell />
     </AtlasContext.Provider>
   );
 }
 
-function Shell({ privateAvailable }: { privateAvailable: boolean }) {
+function Shell() {
   const { route, word } = useLocation();
   const onboarded = useStore((s) => s.settings.onboarded);
   const theme = useStore((s) => s.settings.theme);
   const [palette, setPalette] = useState(false);
+  useEffect(() => {
+    initSync();
+  }, []);
   const [splash, setSplash] = useState(shouldShowSplash);
   const focus = route.page === "learn";
 
@@ -157,7 +171,7 @@ function Shell({ privateAvailable }: { privateAvailable: boolean }) {
         {route.page === "atlas" && <AtlasPage route={route} />}
         {route.page === "learn" && <Learn />}
         {route.page === "practice" && <Practice />}
-        {route.page === "me" && <Me privateAvailable={privateAvailable} />}
+        {route.page === "me" && <Me />}
         {route.page === "about" && <About />}
       </main>
 
@@ -165,7 +179,7 @@ function Shell({ privateAvailable }: { privateAvailable: boolean }) {
         <footer className="footer">
           <Logo compact />
           <p>
-            一词一画，点亮雅思 · 免费开源 ·{" "}
+            一词一画，点亮词汇 · 人教版七年级上册 ·{" "}
             <a href={REPO_URL} target="_blank" rel="noreferrer">
               GitHub
             </a>{" "}

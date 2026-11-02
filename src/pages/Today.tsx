@@ -277,11 +277,11 @@ function LevelPath() {
     }
     return out;
   }, [atlas, cards]);
-  const NAMES = ["入门", "基础", "进阶", "中高", "高级", "精通"];
+  const NAMES = ["入门", "基础", "进阶", "中高", "高级", "精通", "提升", "巩固", "冲刺"];
   return (
     <section className="panel path-panel">
       <div className="panel-head">
-        <h3 className="eyebrow">学习路线 · 从 A1 到 C2</h3>
+        <h3 className="eyebrow">{atlas.cefr[0]?.startsWith("Unit") ? "学习路线 · 按课本单元" : "学习路线 · 从 A1 到 C2"}</h3>
         <span className="legend">
           <i className="lg-seen" /> 已学 <i className="lg-done" /> 已掌握
         </span>
@@ -321,7 +321,7 @@ function Topics() {
   return (
     <section className="topics-panel">
       <div className="panel-head">
-        <h3 className="eyebrow">按雅思话题探索</h3>
+        <h3 className="eyebrow">按话题探索</h3>
         <button className="link" onClick={() => go({ page: "atlas" })}>
           打开图鉴
         </button>
