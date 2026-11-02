@@ -3,7 +3,7 @@ import { useEffect, useMemo } from "react";
 import { prefetch, useAtlas, useEntry } from "../atlas/context";
 import { go, openWord } from "../lib/router";
 import { cue } from "../lib/sound";
-import { hashSeed } from "../lib/text";
+import { hashSeed, wordKey } from "../lib/text";
 import { buildSession, masteredCount, todayPlan } from "../store/session";
 import { isMastered } from "../store/srs";
 import { dayKey, store, useStore } from "../store/store";
@@ -71,6 +71,7 @@ export function Today() {
   });
 
   const learned = Object.keys(progress.cards).length;
+  const litHere = useMemo(() => atlas.words.reduce((n, w) => n + (progress.cards[wordKey(w.word)] ? 1 : 0), 0), [atlas, progress]);
   const mastered = masteredCount(progress);
   const teaser = (active ? active.newIds : plan.fresh).slice(0, 5).map((id) => atlas.byId.get(id)!).filter(Boolean);
 
@@ -192,7 +193,7 @@ export function Today() {
         </section>
 
         <LevelPath />
-        <GalaxyPanel learned={learned} total={atlas.count} />
+        <GalaxyPanel learned={litHere} total={atlas.count} />
         <Topics />
       </div>
     </div>
@@ -201,14 +202,13 @@ export function Today() {
 
 function GalaxyPanel({ learned, total }: { learned: number; total: number }) {
   const today = useStore((s) => s.progress.days[dayKey()]);
-  const ids = useStore((s) => s.progress.cards);
+  const atlas = useAtlas();
+  const cards = useStore((s) => s.progress.cards);
   const todayIds = useMemo(() => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
-    return Object.entries(ids)
-      .filter(([, c]) => c.seen >= start.getTime())
-      .map(([id]) => id);
-  }, [ids]);
+    return atlas.words.filter((w) => (cards[wordKey(w.word)]?.seen ?? 0) >= start.getTime()).map((w) => w.id);
+  }, [atlas, cards]);
   void today;
   return (
     <section className="galaxy-panel" onClick={() => go({ page: "atlas", view: "galaxy" })} role="link" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && go({ page: "atlas", view: "galaxy" })}>
@@ -269,7 +269,7 @@ function LevelPath() {
     for (const w of atlas.words) {
       const l = out[w.cefr];
       l.total++;
-      const c = cards[w.id];
+      const c = cards[wordKey(w.word)];
       if (c) {
         l.seen++;
         if (isMastered(c)) l.mastered++;

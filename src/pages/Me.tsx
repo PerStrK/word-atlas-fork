@@ -187,7 +187,7 @@ export function Me() {
             <button
               className="btn btn-ghost btn-danger"
               onClick={() => {
-                if (confirm("确定清空这个词库的全部学习记录？此操作无法撤销，建议先导出备份。")) {
+                if (confirm("确定清空全部学习记录？所有词库共用这一份记录，此操作无法撤销，建议先导出备份。")) {
                   resetProgress();
                   toast("学习记录已清空");
                 }

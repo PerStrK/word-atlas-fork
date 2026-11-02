@@ -14,7 +14,7 @@ import { Practice } from "./pages/Practice";
 import { Today } from "./pages/Today";
 import { cue } from "./lib/sound";
 import { store, useStore } from "./store/store";
-import { initSync, syncDataset } from "./lib/sync";
+import { initSync, syncGlobal } from "./lib/sync";
 import { datasetById, initDatasets, useDatasets } from "./lib/datasets";
 import { EntryView } from "./ui/EntryView";
 import { AmbienceController, AmbiencePicker } from "./ui/Ambience";
@@ -64,8 +64,9 @@ export default function App() {
         if (cancelled) return;
         atlasRef.current = a;
         store.useDataset(a.id);
+        store.migrateLegacy(a);
         setAtlas(a);
-        void syncDataset(a.id);
+        void syncGlobal();
       },
       (e: Error) => {
         if (cancelled) return;

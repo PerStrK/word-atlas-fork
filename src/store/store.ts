@@ -1,12 +1,15 @@
 import { useSyncExternalStore } from "react";
-import type { Accent } from "../atlas/types";
+import type { Accent, Atlas } from "../atlas/types";
 import type { CardState, Grade } from "./srs";
+import { wordKey } from "../lib/text";
 
 export type QuizKind = "meaning" | "picture" | "listen" | "spell";
 export type Step = { id: string; kind: "intro" } | { id: string; kind: QuizKind; retry?: boolean; options?: string[] };
 
 export interface ActiveSession {
   id: string;
+  /** Dataset this session was built from; sessions do not survive a dataset switch. */
+  ds?: string;
   started: number;
   steps: Step[];
   index: number;
@@ -94,6 +97,9 @@ export const dayKey = (d = new Date()) =>
 
 const SETTINGS_KEY = "word-atlas:settings";
 const progressKey = (id: string) => `word-atlas:v2:${id}`;
+/** Learned words live in ONE pool shared by every dataset, keyed by word. */
+export const GLOBAL_DATASET = "global";
+const GLOBAL_KEY = progressKey(GLOBAL_DATASET);
 
 function read<T>(key: string): T | null {
   try {
@@ -185,7 +191,7 @@ interface State {
 }
 
 let state: State = {
-  progress: emptyProgress("word-atlas-open"),
+  progress: sanitizeProgress(read(GLOBAL_KEY), GLOBAL_DATASET),
   settings: sanitizeSettings(read(SETTINGS_KEY)),
   saveError: false,
 };
@@ -194,7 +200,7 @@ let saveTimer: number | undefined;
 /** Only write when this tab changed something, so idle tabs never clobber newer data. */
 let dirty = false;
 /** Progress is written only after it has been read from storage for this dataset. */
-let loadedId: string | null = null;
+let loadedId: string | null = GLOBAL_DATASET;
 
 function emit() {
   listeners.forEach((l) => l());
@@ -244,9 +250,49 @@ export const store = {
   },
   useDataset(datasetId: string) {
     flush();
-    state = { ...state, progress: sanitizeProgress(read(progressKey(datasetId)), datasetId) };
-    loadedId = datasetId;
+    // Progress is one shared pool across all datasets; switching dataset only
+    // drops an unfinished session built from another dataset's words.
+    if (state.progress.session && state.progress.session.ds !== datasetId) {
+      state = { ...state, progress: { ...state.progress, session: null } };
+      markDirty();
+      flush();
+    }
     emit();
+  },
+  /** One-time merge of a legacy per-dataset local progress into the shared pool. */
+  migrateLegacy(atlas: Atlas) {
+    if (!atlas || atlas.id === GLOBAL_DATASET) return;
+    const flag = `word-atlas:migrated:${atlas.id}`;
+    try {
+      if (localStorage.getItem(flag)) return;
+    } catch {
+      return;
+    }
+    const legacy = sanitizeProgress(read(progressKey(atlas.id)), atlas.id);
+    const entries = Object.entries(legacy.cards);
+    if (entries.length || Object.keys(legacy.days).length) {
+      store.progress((p) => {
+        const cards = { ...p.cards };
+        for (const [id, c] of entries) {
+          const ref = atlas.byId.get(id);
+          if (!ref) continue;
+          const k = wordKey(ref.word);
+          const cur = cards[k];
+          if (!cur || c.s > cur.s || (c.s === cur.s && c.due > cur.due)) cards[k] = c;
+        }
+        const days = { ...p.days };
+        for (const [d, s] of Object.entries(legacy.days)) {
+          const cur = days[d] ?? { n: 0, r: 0, c: 0, t: 0 };
+          days[d] = { n: cur.n + s.n, r: cur.r + s.r, c: cur.c + s.c, t: cur.t + s.t };
+        }
+        return { ...p, cards, days };
+      });
+    }
+    try {
+      localStorage.setItem(flag, "1");
+    } catch {
+      /* ignore */
+    }
   },
   /** Replace local progress with a server copy (cloud sync). */
   adoptProgress(p: Progress) {
@@ -312,7 +358,7 @@ export function importBackup(text: string): { ok: true; cards: number } | { ok: 
   if (!isObj(data) || data.app !== "word-atlas" || data.version !== 2 || !isObj(data.progress))
     return { ok: false, error: "这不是词光的学习备份。" };
   const id = state.progress.datasetId;
-  if (data.progress.datasetId !== id) return { ok: false, error: "备份来自另一个词库，请先切换到对应词库。" };
+  if (data.progress.datasetId !== id) return { ok: false, error: "这份备份来自旧版（各词库独立记录）；新版已改为全词库共享一份记录，无法直接导入。" };
   const progress = sanitizeProgress({ ...data.progress, session: null }, id);
   state = { ...state, progress, settings: { ...sanitizeSettings(data.settings), onboarded: true } };
   emit();

@@ -1,6 +1,6 @@
 import type { Atlas, WordRef } from "../atlas/types";
 import { MEDIA } from "../atlas/types";
-import { hashSeed, normalize, shuffle } from "../lib/text";
+import { hashSeed, normalize, shuffle, wordKey } from "../lib/text";
 import { isMastered, review, Rating, type Grade } from "./srs";
 import { bumpDay, dayKey, store, type ActiveSession, type Progress, type QuizKind, type Settings, type Step } from "./store";
 
@@ -21,7 +21,7 @@ export function nextNew(atlas: Atlas, p: Progress, settings: Settings, count: nu
   const pass = (from: number) => {
     for (const w of atlas.words) {
       if (out.length >= count) return;
-      if (w.cefr < from || p.cards[w.id] || out.includes(w.id)) continue;
+      if (w.cefr < from || p.cards[wordKey(w.word)] || out.includes(w.id)) continue;
       out.push(w.id);
     }
   };
@@ -31,14 +31,19 @@ export function nextNew(atlas: Atlas, p: Progress, settings: Settings, count: nu
 }
 
 export function todayPlan(atlas: Atlas, p: Progress, s: Settings) {
-  const due = dueIds(p).filter((id) => atlas.byId.has(id));
+  const keyToId = new Map<string, string>();
+  for (const w of atlas.words) {
+    const k = wordKey(w.word);
+    if (!keyToId.has(k)) keyToId.set(k, w.id);
+  }
+  const due = dueIds(p).filter((k) => keyToId.has(k)).map((k) => keyToId.get(k)!);
   const newLeft = Math.max(0, s.dailyNew - newToday(p));
   const fresh = nextNew(atlas, p, s, newLeft);
   return { due, fresh, minutes: Math.max(1, Math.round(due.length * 0.25 + fresh.length * 0.9)) };
 }
 
 function quizKind(ref: WordRef, p: Progress, s: Settings, salt: number): QuizKind {
-  const c = p.cards[ref.id];
+  const c = p.cards[wordKey(ref.word)];
   const hasImg = !!(ref.media & MEDIA.img);
   const roll = hashSeed(ref.id + salt) % 100;
   if (!c || c.s < 2) {
@@ -86,8 +91,12 @@ export function distractors(atlas: Atlas, ref: WordRef, kind: QuizKind, seed: nu
 export function buildSession(atlas: Atlas, p: Progress, s: Settings, opts?: { ids?: string[]; reviewOnly?: boolean }): ActiveSession {
   const seed = Date.now();
   const plan = todayPlan(atlas, p, s);
-  const reviewIds = opts?.ids ? opts.ids.filter((id) => p.cards[id]) : plan.due.slice(0, 120);
-  const newIds = opts?.ids ? opts.ids.filter((id) => !p.cards[id]) : opts?.reviewOnly ? [] : plan.fresh;
+  const hasCard = (id: string) => {
+    const r = atlas.byId.get(id);
+    return !!r && !!p.cards[wordKey(r.word)];
+  };
+  const reviewIds = opts?.ids ? opts.ids.filter(hasCard) : plan.due.slice(0, 120);
+  const newIds = opts?.ids ? opts.ids.filter((id) => !hasCard(id)) : opts?.reviewOnly ? [] : plan.fresh;
   const steps: Step[] = [];
   const quiz = (id: string, salt: number): Step => {
     const ref = atlas.byId.get(id)!;
@@ -102,7 +111,7 @@ export function buildSession(atlas: Atlas, p: Progress, s: Settings, opts?: { id
     group.forEach((id) => steps.push({ id, kind: "intro" }));
     shuffle(group, seed + g).forEach((id, i) => steps.push(quiz(id, 1000 + g + i)));
   }
-  return { id: `s${seed}`, started: seed, steps, index: 0, graded: {}, newIds, reviewIds };
+  return { id: `s${seed}`, ds: atlas.id, started: seed, steps, index: 0, graded: {}, newIds, reviewIds };
 }
 
 export function gradeFor(kind: QuizKind, correct: boolean, ms: number, hinted: boolean): Grade {
@@ -118,6 +127,7 @@ export function gradeFor(kind: QuizKind, correct: boolean, ms: number, hinted: b
 /** Apply an answer. Only the first attempt for a word in a session updates memory and stats. */
 export function answer(atlas: Atlas, step: Step & { kind: QuizKind }, correct: boolean, grade: Grade, value: string) {
   const { settings } = store.get();
+  const stepKey = wordKey(atlas.byId.get(step.id)!.word);
   store.progress((p) => {
     const sess = p.session;
     if (!sess) return p;
@@ -126,7 +136,7 @@ export function answer(atlas: Atlas, step: Step & { kind: QuizKind }, correct: b
     if (first) {
       next = {
         ...next,
-        cards: { ...next.cards, [step.id]: review(p.cards[step.id], grade, Date.now(), settings.retention) },
+        cards: { ...next.cards, [stepKey]: review(p.cards[stepKey], grade, Date.now(), settings.retention) },
         session: { ...next.session!, graded: { ...sess.graded, [step.id]: grade } },
         mistakes: correct ? next.mistakes : [step.id, ...next.mistakes.filter((x) => x !== step.id)].slice(0, 300),
       };

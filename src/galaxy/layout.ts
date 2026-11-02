@@ -1,5 +1,5 @@
 import type { Atlas } from "../atlas/types";
-import { hashSeed } from "../lib/text";
+import { hashSeed, wordKey } from "../lib/text";
 
 /** Nineteen star colours, one per IELTS topic, tuned to glow on deep navy. */
 export const TOPIC_COLORS = [
@@ -27,6 +27,8 @@ export interface GalaxyLayout {
   colors: Float32Array;
   seeds: Float32Array;
   ids: string[];
+  /** Shared-pool key (normalized word) per star. */
+  keys: string[];
   index: Map<string, number>;
   /** Centre of each topic cluster, for floating labels. */
   topicCenters: [number, number, number][];
@@ -70,6 +72,7 @@ export function layoutGalaxy(atlas: Atlas): GalaxyLayout {
     colors,
     seeds,
     ids: words.map((w) => w.id),
+    keys: words.map((w) => wordKey(w.word)),
     index: new Map(words.map((w, i) => [w.id, i])),
     topicCenters: atlas.topics.map((_, t) => {
       const a = (t / arms) * Math.PI * 2 + mid * 3.4;

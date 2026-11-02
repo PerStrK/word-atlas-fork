@@ -13,6 +13,7 @@ import re
 import secrets
 import sqlite3
 import time
+import unicodedata
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse, parse_qs, unquote
@@ -33,24 +34,41 @@ SEED_USERS = [("admin", "password", "admin"), ("lele", "123321", "user")]
 # ---- dataset unit map (for admin progress setting) ----
 ATLAS_INDEX = HERE.parent / "app-src" / "public" / "atlas" / "index.json"
 DATASET_ID = "pep-g7s1-atlas"
+GLOBAL_DATASET = "global"
 UNIT_ORDER: list = []
 UNIT_MAP: dict = {}
 ALL_IDS: set = set()
+UNIT_KEYS: dict = {}
+ALL_KEYS: set = set()
+
+
+def word_key(w: str) -> str:
+    """Shared-pool key for a word; mirrors the client's normalize()."""
+    s = unicodedata.normalize("NFKC", str(w))
+    s = s.replace("’", "'").replace("‘", "'")
+    s = re.sub(r"[‐‑–—]", "-", s)
+    s = re.sub(r"\s+", " ", s)
+    return s.strip().lower()
 DAY_MS = 86400_000
 
 
 def load_units():
-    global UNIT_ORDER, UNIT_MAP, ALL_IDS
+    global UNIT_ORDER, UNIT_MAP, ALL_IDS, UNIT_KEYS, ALL_KEYS
     try:
         idx = json.loads(ATLAS_INDEX.read_text(encoding="utf-8"))
         fi = idx["fields"].index("cefr")
         ii = idx["fields"].index("id")
+        wi = idx["fields"].index("word")
         UNIT_ORDER = list(idx["cefr"])
         m = {u: [] for u in UNIT_ORDER}
+        km = {u: set() for u in UNIT_ORDER}
         for w in idx["words"]:
             m[UNIT_ORDER[w[fi]]].append(w[ii])
+            km[UNIT_ORDER[w[fi]]].add(word_key(w[wi]))
         UNIT_MAP = m
+        UNIT_KEYS = km
         ALL_IDS = {i for ids in m.values() for i in ids}
+        ALL_KEYS = set().union(*km.values()) if km else set()
         print(f"units loaded: {[(u, len(UNIT_MAP[u])) for u in UNIT_ORDER]}", flush=True)
     except Exception as e:
         print(f"unit map load failed: {e}", flush=True)
@@ -65,8 +83,8 @@ def learned_card(now: int) -> dict:
 def completed_units(cards: dict) -> int:
     n = 0
     for u in UNIT_ORDER:
-        ids = UNIT_MAP.get(u, [])
-        if ids and all(i in cards for i in ids):
+        keys = UNIT_KEYS.get(u, set())
+        if keys and all(k in cards for k in keys):
             n += 1
         else:
             break
@@ -310,8 +328,8 @@ class H(BaseHTTPRequestHandler):
                 for pr in conn.execute("SELECT dataset, data FROM progress WHERE username = ?", (r["username"],)):
                     try:
                         pcards = json.loads(pr["data"]).get("cards") or {}
-                        cards += len(pcards)
-                        if pr["dataset"] == DATASET_ID:
+                        if pr["dataset"] == GLOBAL_DATASET:
+                            cards = len(pcards)
                             units = completed_units(pcards)
                     except Exception:
                         pass
@@ -395,7 +413,7 @@ class H(BaseHTTPRequestHandler):
                 conn.close()
                 return self._send(404, {"error": "账号不存在。"})
             prow = conn.execute("SELECT data FROM progress WHERE username = ? AND dataset = ?",
-                                (username, DATASET_ID)).fetchone()
+                                (username, GLOBAL_DATASET)).fetchone()
             if prow:
                 try:
                     progress = json.loads(prow["data"])
@@ -404,23 +422,23 @@ class H(BaseHTTPRequestHandler):
             else:
                 progress = None
             if not isinstance(progress, dict) or progress.get("version") != 2:
-                progress = {"version": 2, "datasetId": DATASET_ID, "cards": {}, "bookmarks": [],
+                progress = {"version": 2, "datasetId": GLOBAL_DATASET, "cards": {}, "bookmarks": [],
                             "days": {}, "typing": [], "session": None, "mistakes": []}
             keep = set()
             for u in UNIT_ORDER[:units]:
-                keep.update(UNIT_MAP.get(u, []))
+                keep.update(UNIT_KEYS.get(u, set()))
             now = int(time.time() * 1000)
             new_cards = {}
-            for wid, card in (progress.get("cards") or {}).items():
-                if wid in keep or wid not in ALL_IDS:
-                    new_cards[wid] = card
-            for wid in keep:
-                if wid not in new_cards:
-                    new_cards[wid] = learned_card(now)
+            for key, card in (progress.get("cards") or {}).items():
+                if key in keep or key not in ALL_KEYS:
+                    new_cards[key] = card
+            for key in keep:
+                if key not in new_cards:
+                    new_cards[key] = learned_card(now)
             progress["cards"] = new_cards
             progress["session"] = None
             conn.execute("INSERT OR REPLACE INTO progress (username, dataset, data, client_ts, server_ts) VALUES (?, ?, ?, ?, ?)",
-                         (username, DATASET_ID, json.dumps(progress, ensure_ascii=False), now, now))
+                         (username, GLOBAL_DATASET, json.dumps(progress, ensure_ascii=False), now, now))
             conn.commit()
             conn.close()
             return self._send(200, {"ok": True, "cards": len(new_cards), "units": units})

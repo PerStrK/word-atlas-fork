@@ -1,26 +1,33 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../lib/auth";
-import { setActive, setEnabled, useDatasets } from "../lib/datasets";
+import { datasetWordKeys, setActive, setEnabled, useDatasets } from "../lib/datasets";
+import { useStore } from "../store/store";
 import { toast } from "../ui/Toast";
-
-function localCards(id: string): number {
-  try {
-    const raw = localStorage.getItem(`word-atlas:v2:${id}`);
-    if (!raw) return 0;
-    const p = JSON.parse(raw);
-    return Object.keys(p.cards ?? {}).length;
-  } catch {
-    return 0;
-  }
-}
 
 export function DatasetsPanel() {
   const { list, enabled, active } = useDatasets();
   const { user } = useAuth();
-  const [, setTick] = useState(0);
+  const cards = useStore((s) => s.progress.cards);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
   useEffect(() => {
-    setTick((x) => x + 1);
-  }, [active, user]);
+    let live = true;
+    void (async () => {
+      const out: Record<string, number> = {};
+      for (const d of list) {
+        const keys = await datasetWordKeys(d);
+        let n = 0;
+        keys.forEach((k) => {
+          if (cards[k]) n++;
+        });
+        out[d.id] = n;
+      }
+      if (live) setCounts(out);
+    })();
+    return () => {
+      live = false;
+    };
+  }, [list, cards]);
 
   const toggle = (id: string, on: boolean) => {
     if (!on && enabled.length <= 1) {
@@ -34,9 +41,8 @@ export function DatasetsPanel() {
     <section className="panel">
       <h3 className="eyebrow">词库</h3>
       <p className="muted">
-        {user
-          ? "勾选要载入的词库，选择会跟随账号保存，换设备一致。每个词库的学习进度互相独立、分别同步。"
-          : "勾选要载入的词库（登录后选择会跟随账号保存，现在只存本机）。每个词库的学习进度互相独立。"}
+        词库只是学习任务的范围不同：已学、已掌握的词在所有词库之间共享，学过一次就不会重复学。
+        {user ? "启用选择会跟随账号保存，换设备一致。" : "登录后，启用选择会跟随账号保存；现在只存本机。"}
       </p>
       <div className="admin-users">
         {list.map((d) => {
@@ -48,7 +54,7 @@ export function DatasetsPanel() {
                 <b>{d.name}</b>
                 {isActive && <span className="acct-badge">使用中</span>}
                 <small className="muted">
-                  {d.desc} · 共 {d.count.toLocaleString()} 词 · 已学 {localCards(d.id)} 词
+                  {d.desc} · 共 {d.count.toLocaleString()} 词 · 已学 {counts[d.id] ?? "…"} 词（共享）
                 </small>
               </div>
               <div className="acct-row">

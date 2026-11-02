@@ -32,7 +32,7 @@ function starStates(layout: GalaxyLayout, cards: Record<string, { st: number; s:
   layout.ids.forEach((id, i) => {
     if (highlight?.has(id)) out[i] = 3;
     else {
-      const c = cards[id];
+      const c = cards[layout.keys[i]];
       out[i] = c ? (isMastered(c as never) ? 2 : 1) : 0;
     }
   });
@@ -269,7 +269,7 @@ export function Galaxy({
     return () => cv.removeEventListener("wheel", stop);
   }, [mode]);
 
-  const lit = useMemo(() => layout.ids.reduce((n, id) => n + (cards[id] ? 1 : 0), 0), [layout, cards]);
+  const lit = useMemo(() => layout.ids.reduce((n, _id, i) => n + (cards[layout.keys[i]] ? 1 : 0), 0), [layout, cards]);
 
   if (mode === "mini")
     return (

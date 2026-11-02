@@ -4,7 +4,7 @@ import { prefetch, useAtlas } from "../atlas/context";
 import type { Entry } from "../atlas/types";
 import { play, stopAudio } from "../lib/audio";
 import { cue } from "../lib/sound";
-import { hashSeed, shuffle } from "../lib/text";
+import { hashSeed, shuffle, wordKey } from "../lib/text";
 import { clean, correctCharacterCount, same, typingDelta, typingMetrics } from "../lib/typing";
 import { store, useStore } from "../store/store";
 import { AmbiencePicker } from "../ui/Ambience";
@@ -34,9 +34,15 @@ export function Practice() {
   const [round, setRound] = useState<{ entries: Entry[]; key: number } | null>(null);
 
   const pool = useMemo(() => {
+    const keyToId = new Map<string, string>();
+    for (const w of atlas.words) {
+      const k = wordKey(w.word);
+      if (!keyToId.has(k)) keyToId.set(k, w.id);
+    }
     const learned = Object.entries(progress.cards)
       .sort((a, b) => (b[1].last ?? 0) - (a[1].last ?? 0))
-      .map(([id]) => id);
+      .map(([k]) => keyToId.get(k))
+      .filter((id): id is string => !!id);
     const ids =
       source === "recent" ? learned : source === "mistakes" ? progress.mistakes : source === "saved" ? progress.bookmarks : atlas.words.filter((w) => w.cefr >= startLevel).slice(0, 400).map((w) => w.id);
     return ids.filter((id) => atlas.byId.has(id));

@@ -1,7 +1,7 @@
 import { Bookmark, BookmarkCheck, Lightbulb, Share2 } from "lucide-react";
 import type { Entry, WordRef } from "../atlas/types";
 import { useAtlas } from "../atlas/context";
-import { splitHighlight, splitPair } from "../lib/text";
+import { splitHighlight, splitPair, wordKey } from "../lib/text";
 import { formatInterval, isMastered } from "../store/srs";
 import { toggleBookmark, useStore } from "../store/store";
 import { Illustration } from "./Illustration";
@@ -53,7 +53,7 @@ export function Pronounce({ entry, refw }: { entry: Entry; refw: WordRef | Entry
 export function EntryView({ entry, mode = "detail", eager = true }: { entry: Entry; mode?: "detail" | "intro" | "reveal"; eager?: boolean }) {
   const atlas = useAtlas();
   const ref = atlas.byId.get(entry.id);
-  const card = useStore((s) => s.progress.cards[entry.id]);
+  const card = useStore((s) => s.progress.cards[wordKey(entry.w)]);
   const saved = useStore((s) => s.progress.bookmarks.includes(entry.id));
   const accent = useStore((s) => s.settings.accent);
   const topicIdx = atlas.topics.findIndex((t) => t[0] === entry.topic);

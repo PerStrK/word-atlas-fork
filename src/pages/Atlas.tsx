@@ -5,6 +5,7 @@ import { useAtlas } from "../atlas/context";
 import type { WordRef } from "../atlas/types";
 import { morphFrom } from "../lib/motion";
 import { go, openWord, type Route } from "../lib/router";
+import { wordKey } from "../lib/text";
 import { isMastered } from "../store/srs";
 import { useStore } from "../store/store";
 import { Illustration } from "../ui/Illustration";
@@ -81,7 +82,7 @@ export function AtlasPage({
     return base.filter((w) => {
       if (ti >= 0 && w.topic !== ti) return false;
       if (li >= 0 && w.cefr !== li) return false;
-      const c = cards[w.id];
+      const c = cards[wordKey(w.word)];
       if (status === "new") return !c;
       if (status === "learning") return !!c && !isMastered(c);
       if (status === "mastered") return isMastered(c);
@@ -314,7 +315,7 @@ function VirtualGrid({
       for (let c = 0; c < cols; c++) {
         const w = items[r * cols + c];
         if (!w) break;
-        const card = cards[w.id];
+        const card = cards[wordKey(w.word)];
         const st = card
           ? card.st === 2 && card.s >= 21
             ? "is-mastered"
@@ -373,7 +374,7 @@ function VirtualList({
   return (
     <div ref={box} className="vlist" style={{ height: items.length * rowH }}>
       {items.slice(a, b).map((w, i) => {
-        const card = cards[w.id];
+        const card = cards[wordKey(w.word)];
         return (
           <div
             key={w.id}

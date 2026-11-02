@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { apiGet, apiPut, auth } from "./auth";
+import { wordKey } from "./text";
 
 export interface DatasetInfo {
   id: string;
@@ -125,4 +126,31 @@ export function setActive(id: string) {
   active = id;
   persistLocal();
   emit();
+}
+
+const keyCache = new Map<string, Promise<Set<string>>>();
+
+/** Word keys (normalized words) of a dataset, from its index file; cached. */
+export function datasetWordKeys(info: DatasetInfo): Promise<Set<string>> {
+  let p = keyCache.get(info.id);
+  if (!p) {
+    p = (async () => {
+      const out = new Set<string>();
+      try {
+        const r = await fetch(`${import.meta.env.BASE_URL}${info.root}/index.json`);
+        if (r.ok) {
+          const idx = (await r.json()) as { words?: unknown[] };
+          for (const row of idx.words ?? []) {
+            const w = (row as [string, string])[1];
+            if (w) out.add(wordKey(w));
+          }
+        }
+      } catch {
+        /* leave empty */
+      }
+      return out;
+    })();
+    keyCache.set(info.id, p);
+  }
+  return p;
 }

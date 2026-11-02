@@ -40,6 +40,8 @@ export const normalize = (s: string) =>
     .trim()
     .toLowerCase();
 
+export const wordKey = (w: string) => normalize(w);
+
 export function shuffle<T>(xs: T[], seed = Math.random() * 2 ** 31): T[] {
   const out = [...xs];
   let x = Math.floor(seed) || 1;
