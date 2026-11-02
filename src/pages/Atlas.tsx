@@ -105,7 +105,7 @@ export function AtlasPage({
             都有一幅画。
           </h1>
           <p className="lede">
-            {atlas.examples.toLocaleString()} 条原创例句 · 英美发音 · {atlas.cefr[0]?.startsWith("Unit") ? "按单元和" : "按难度和"} {atlas.topics.length} 个话题整理
+            {atlas.examples.toLocaleString()} 条原创例句 · 英美发音 · {atlas.cefr[0]?.includes("Unit") ? "按单元和" : "按难度和"} {atlas.topics.length} 个话题整理
           </p>
         </div>
         <label className="search">
@@ -132,12 +132,12 @@ export function AtlasPage({
       <div className="filters">
         {view !== "galaxy" && (
           <>
-            <div className="chips chips-scroll" role="group" aria-label={atlas.cefr[0]?.startsWith("Unit") ? "单元" : "难度"}>
+            <div className="chips chips-scroll" role="group" aria-label={atlas.cefr[0]?.includes("Unit") ? "单元" : "难度"}>
               <button
                 className={`chip-btn ${!level ? "is-on" : ""}`}
                 onClick={() => setFilter({ level: undefined })}
               >
-                {atlas.cefr[0]?.startsWith("Unit") ? "所有单元" : "所有难度"}
+                {atlas.cefr[0]?.includes("Unit") ? "所有单元" : "所有难度"}
               </button>
               {atlas.cefr.map((l) => (
                 <button

@@ -137,14 +137,14 @@ function StageSetter({
     setN(value);
   }, [value, info.id]);
   const names = stages?.names ?? [];
-  const isUnit = names.length > 0 && names[0].startsWith("Unit");
+  const isUnit = names.length > 0 && names[0].includes("Unit");
   const apply = async () => {
     setBusy(true);
     try {
       const d = await apiPost("/admin/progress", { username, dataset: info.id, stages: n });
       toast(
         isUnit
-          ? `已把「${username}」在${info.name}设为学完 ${n} 个单元（共享池共 ${d.cards} 词）`
+          ? `已把「${username}」在${info.name}设为学完前 ${n} 个阶段${n > 0 ? `（到 ${names[n - 1]}）` : ""}（共享池共 ${d.cards} 词）`
           : `已把「${username}」在${info.name}的进度设到 ${n === 0 ? "未开始" : names[n - 1]}（共享池共 ${d.cards} 词）`,
       );
       onDone();
@@ -161,11 +161,10 @@ function StageSetter({
       <select value={n} onChange={(e) => setN(Number(e.target.value))} disabled={busy}>
         {Array.from({ length: names.length + 1 }, (_, i) => (
           <option key={i} value={i}>
-            {isUnit ? i : i === 0 ? "未开始" : names[i - 1]}
+            {isUnit ? (i === 0 ? "未开始" : `学完 ${i} 个（到 ${names[i - 1]}）`) : i === 0 ? "未开始" : names[i - 1]}
           </option>
         ))}
       </select>
-      {isUnit && <span className="muted">个单元</span>}
       <button className="btn btn-ghost" disabled={busy || n === value} onClick={() => void apply()}>
         设定进度
       </button>
@@ -286,8 +285,10 @@ export function AdminPanel() {
                       const st = stageMap[d.id];
                       if (!st || st.names.length === 0) return null;
                       const v = u.stages?.[d.id] ?? 0;
-                      const label = st.names[0].startsWith("Unit")
-                        ? `${v} 单元`
+                      const label = st.names[0].includes("Unit")
+                        ? v === 0
+                          ? "未开始"
+                          : `学到 ${st.names[v - 1]}`
                         : v === 0
                           ? "未开始"
                           : st.names[v - 1];

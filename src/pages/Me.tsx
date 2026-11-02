@@ -123,7 +123,7 @@ export function Me() {
               ))}
             </div>
           </Field>
-          <Field label={atlas.cefr[0]?.startsWith("Unit") ? "从哪个单元开始" : "从哪个难度开始"} hint={atlas.cefr[0]?.startsWith("Unit") ? "跳过前面已经学过的单元。" : "跳过已经熟悉的低级别词。"}>
+          <Field label={atlas.cefr[0]?.includes("Unit") ? "从哪个单元开始" : "从哪个难度开始"} hint={atlas.cefr[0]?.includes("Unit") ? "跳过前面已经学过的单元。" : "跳过已经熟悉的低级别词。"}>
             <div className="segmented">
               {atlas.cefr.map((l, i) => (
                 <button key={l} className={settings.startLevel === i ? "is-on" : ""} onClick={() => set({ startLevel: i })}>

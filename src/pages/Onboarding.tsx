@@ -11,15 +11,15 @@ const LEVELS_IELTS = [
 ];
 
 const LEVELS_UNITS = [
-  ["Unit 1", "第一单元", "从头开始"],
+  ["Starter Unit 1", "预备单元一", "从头开始"],
+  ["Unit 1", "第一单元", "预备单元已学完"],
   ["Unit 2", "第二单元", "第一单元已学完"],
-  ["Unit 3", "第三单元", "前两单元已学完"],
-  ["Unit 5", "第五单元", "前四单元已学完"],
+  ["Unit 4", "第四单元", "前三单元已学完"],
 ];
 
 export function Onboarding() {
   const atlas = useAtlas();
-  const LEVELS = atlas.cefr[0]?.startsWith("Unit") ? LEVELS_UNITS : LEVELS_IELTS;
+  const LEVELS = atlas.cefr[0]?.includes("Unit") ? LEVELS_UNITS : LEVELS_IELTS;
   const [level, setLevel] = useState(1);
   const [goal, setGoal] = useState(10);
   const finish = () => store.settings({ onboarded: true, startLevel: atlas.cefr.indexOf(LEVELS[level][0]), dailyNew: goal });

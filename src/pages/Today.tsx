@@ -278,13 +278,17 @@ function LevelPath() {
     return out;
   }, [atlas, cards]);
   const ORDINALS = "一二三四五六七八九";
-  const NAMES = atlas.cefr[0]?.startsWith("Unit")
-    ? atlas.cefr.map((_, i) => (i < 9 ? `第${ORDINALS[i]}单元` : `第${i + 1}单元`))
+  const NAMES = atlas.cefr[0]?.includes("Unit")
+    ? atlas.cefr.map((name) => {
+        const num = parseInt(name.match(/\d+/)?.[0] ?? "1", 10);
+        const cn = ORDINALS[num - 1] ?? String(num);
+        return name.startsWith("Starter") ? `预备单元${cn}` : `第${cn}单元`;
+      })
     : ["入门", "基础", "进阶", "中高", "高级", "精通", "提升", "巩固", "冲刺"];
   return (
     <section className="panel path-panel">
       <div className="panel-head">
-        <h3 className="eyebrow">{atlas.cefr[0]?.startsWith("Unit") ? "学习路线 · 按课本单元" : "学习路线 · 从 A1 到 C2"}</h3>
+        <h3 className="eyebrow">{atlas.cefr[0]?.includes("Unit") ? "学习路线 · 按课本单元" : "学习路线 · 从 A1 到 C2"}</h3>
         <span className="legend">
           <i className="lg-seen" /> 已学 <i className="lg-done" /> 已掌握
         </span>
@@ -297,7 +301,7 @@ function LevelPath() {
             <li key={l.name} className={`${i === start ? "is-start" : ""} ${l.seen ? "is-on" : ""}`}>
               <button onClick={() => go({ page: "atlas", level: l.name })} aria-label={`${l.name} ${NAMES[i]}，已学 ${l.seen} / ${l.total}`}>
                 <span className="station" style={{ "--seen": seen, "--done": done } as React.CSSProperties}>
-                  <b>{l.name}</b>
+                  <b>{l.name.replace(/^Starter Unit (\d+)$/, "预$1")}</b>
                 </span>
                 <span className="station-name">{NAMES[i]}</span>
                 <span className="station-count">

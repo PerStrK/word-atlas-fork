@@ -1,0 +1,2067 @@
+{
+ "id": "pep-junior-g7-s1",
+ "title": "人教版初中英语 · 七年级上册（2024 新版）",
+ "stage": "junior",
+ "edition": "PEP 2024",
+ "source": "教材附录 Vocabulary in Each Unit (pp.115-121)",
+ "units": [
+  {
+   "id": "starter-unit-1",
+   "title": "Starter Unit 1",
+   "words": [
+    {
+     "en": "unit",
+     "zh": "n. 单元",
+     "phonetic": "/ˈjuːnɪt/",
+     "page": 1
+    },
+    {
+     "en": "starter unit",
+     "zh": "过渡单元",
+     "phonetic": "/ˈstɑːtə(r)/",
+     "page": 1
+    },
+    {
+     "en": "section",
+     "zh": "n. 部分；地区",
+     "phonetic": "/ˈsekʃn/",
+     "page": 1
+    },
+    {
+     "en": "greet",
+     "zh": "v. 招呼；问候",
+     "phonetic": "/ɡriːt/",
+     "page": 1
+    },
+    {
+     "en": "each",
+     "zh": "adj. & pron. 每个；各自",
+     "phonetic": "/iːtʃ/",
+     "page": 2
+    },
+    {
+     "en": "other",
+     "zh": "pron. 另外的人（或物） adj. 另外的；其他的",
+     "phonetic": "/ˈʌðə(r)/",
+     "page": 2
+    },
+    {
+     "en": "each other",
+     "zh": "互相；彼此",
+     "phonetic": "",
+     "page": 2
+    },
+    {
+     "en": "oh",
+     "zh": "interj. 哦；啊",
+     "phonetic": "/əʊ/",
+     "page": 2
+    },
+    {
+     "en": "everyone",
+     "zh": "pron. 每人；所有人",
+     "phonetic": "/ˈevriwʌn/",
+     "page": 2
+    },
+    {
+     "en": "start",
+     "zh": "v. 开始；着手",
+     "phonetic": "/stɑːt/",
+     "page": 4
+    },
+    {
+     "en": "conversation",
+     "zh": "n. 谈话；交谈",
+     "phonetic": "/ˌkɒnvəˈseɪʃn/",
+     "page": 4
+    },
+    {
+     "en": "spell",
+     "zh": "v. 用字母拼；拼写",
+     "phonetic": "/spel/",
+     "page": 4
+    },
+    {
+     "en": "bell",
+     "zh": "n. 铃（声）；钟（声）",
+     "phonetic": "/bel/",
+     "page": 4
+    },
+    {
+     "en": "Helen",
+     "zh": "海伦",
+     "phonetic": "/ˈhelən/",
+     "page": 1
+    },
+    {
+     "en": "Ella",
+     "zh": "埃拉",
+     "phonetic": "/ˈelə/",
+     "page": 1
+    },
+    {
+     "en": "Emma",
+     "zh": "埃玛",
+     "phonetic": "/ˈemə/",
+     "page": 1
+    },
+    {
+     "en": "Peter",
+     "zh": "彼得",
+     "phonetic": "/ˈpiːtə(r)/",
+     "page": 1
+    },
+    {
+     "en": "Brown",
+     "zh": "布朗",
+     "phonetic": "/braʊn/",
+     "page": 2
+    },
+    {
+     "en": "PRC",
+     "zh": "中华人民共和国",
+     "phonetic": "/ˌpiː ɑː(r) ˈsiː/",
+     "page": 3
+    },
+    {
+     "en": "PLA",
+     "zh": "中国人民解放军",
+     "phonetic": "/ˌpiː el ˈeɪ/",
+     "page": 3
+    },
+    {
+     "en": "VR",
+     "zh": "虚拟现实",
+     "phonetic": "/ˌviː ˈɑː(r)/",
+     "page": 3
+    },
+    {
+     "en": "WHO",
+     "zh": "世界卫生组织",
+     "phonetic": "/ˌdʌbljuː eɪtʃ ˈəʊ/",
+     "page": 3
+    },
+    {
+     "en": "UN",
+     "zh": "联合国",
+     "phonetic": "/ˌjuː ˈen/",
+     "page": 3
+    },
+    {
+     "en": "Miller",
+     "zh": "米勒",
+     "phonetic": "/ˈmɪlə(r)/",
+     "page": 4
+    }
+   ]
+  },
+  {
+   "id": "starter-unit-2",
+   "title": "Starter Unit 2",
+   "words": [
+    {
+     "en": "bottle",
+     "zh": "n. 瓶子",
+     "phonetic": "/ˈbɒtl/",
+     "page": 7
+    },
+    {
+     "en": "eraser",
+     "zh": "n. 橡皮",
+     "phonetic": "/ɪˈreɪzə(r)/",
+     "page": 7
+    },
+    {
+     "en": "key",
+     "zh": "n. 钥匙；关键",
+     "phonetic": "/kiː/",
+     "page": 7
+    },
+    {
+     "en": "thing",
+     "zh": "n. 东西；事情",
+     "phonetic": "/θɪŋ/",
+     "page": 10
+    },
+    {
+     "en": "need",
+     "zh": "v. & n. 需要",
+     "phonetic": "/niːd/",
+     "page": 10
+    },
+    {
+     "en": "You’re welcome.",
+     "zh": "别客气；不用谢。",
+     "phonetic": "",
+     "page": 11
+    }
+   ]
+  },
+  {
+   "id": "starter-unit-3",
+   "title": "Starter Unit 3",
+   "words": [
+    {
+     "en": "fun",
+     "zh": "n. 乐趣；快乐 adj. 有趣的；使人快乐的",
+     "phonetic": "/fʌn/",
+     "page": 13
+    },
+    {
+     "en": "yard",
+     "zh": "n. 院子；园圃",
+     "phonetic": "/jɑːd/",
+     "page": 13
+    },
+    {
+     "en": "carrot",
+     "zh": "n. 胡萝卜",
+     "phonetic": "/ˈkærət/",
+     "page": 13
+    },
+    {
+     "en": "goose",
+     "zh": "n. ( pl. geese ) 鹅",
+     "phonetic": "/ɡuːs/ /ɡiːs/",
+     "page": 14
+    },
+    {
+     "en": "count",
+     "zh": "v. 数数",
+     "phonetic": "/kaʊnt/",
+     "page": 16
+    },
+    {
+     "en": "another",
+     "zh": "adj. & pron. 另一； 又一（人或事物）",
+     "phonetic": "/əˈnʌðə(r)/",
+     "page": 16
+    },
+    {
+     "en": "else",
+     "zh": "adv. 其他的；别的",
+     "phonetic": "/els/",
+     "page": 17
+    },
+    {
+     "en": "circle",
+     "zh": "v. 圈出 n. 圆形；圆圈",
+     "phonetic": "/ˈsɜːkl/",
+     "page": 17
+    },
+    {
+     "en": "look at",
+     "zh": "看；瞧",
+     "phonetic": "",
+     "page": 17
+    }
+   ]
+  },
+  {
+   "id": "unit-1",
+   "title": "Unit 1",
+   "words": [
+    {
+     "en": "make friends",
+     "zh": "交朋友",
+     "phonetic": "",
+     "page": 19
+    },
+    {
+     "en": "get to know",
+     "zh": "认识；了解",
+     "phonetic": "",
+     "page": 20
+    },
+    {
+     "en": "full",
+     "zh": "adj. 完整的；满的",
+     "phonetic": "/fʊl/",
+     "page": 20
+    },
+    {
+     "en": "full name",
+     "zh": "全名",
+     "phonetic": "",
+     "page": 20
+    },
+    {
+     "en": "grade",
+     "zh": "n. 年级；等级",
+     "phonetic": "/ɡreɪd/",
+     "page": 20
+    },
+    {
+     "en": "last name",
+     "zh": "姓氏",
+     "phonetic": "",
+     "page": 20
+    },
+    {
+     "en": "classmate",
+     "zh": "n. 同班同学",
+     "phonetic": "/ˈklɑːsmeɪt/",
+     "page": 21
+    },
+    {
+     "en": "class teacher",
+     "zh": "班主任",
+     "phonetic": "",
+     "page": 21
+    },
+    {
+     "en": "first name",
+     "zh": "名字",
+     "phonetic": "",
+     "page": 21
+    },
+    {
+     "en": "mistake",
+     "zh": "n. 错误；失误",
+     "phonetic": "/mɪˈsteɪk/",
+     "page": 21
+    },
+    {
+     "en": "country",
+     "zh": "n. 国家",
+     "phonetic": "/ˈkʌntri/",
+     "page": 22
+    },
+    {
+     "en": "same",
+     "zh": "adj. 相同的",
+     "phonetic": "/seɪm/",
+     "page": 23
+    },
+    {
+     "en": "twin",
+     "zh": "n. 双胞胎之一 adj. 双胞胎之一的",
+     "phonetic": "/twɪn/",
+     "page": 23
+    },
+    {
+     "en": "both",
+     "zh": "adj. & pron. 两个； 两个都",
+     "phonetic": "/bəʊθ/",
+     "page": 23
+    },
+    {
+     "en": "band",
+     "zh": "n. 乐队",
+     "phonetic": "/bænd/",
+     "page": 23
+    },
+    {
+     "en": "pot",
+     "zh": "n. 锅",
+     "phonetic": "/pɒt/",
+     "page": 23
+    },
+    {
+     "en": "a lot",
+     "zh": "很；非常",
+     "phonetic": "",
+     "page": 23
+    },
+    {
+     "en": "tofu",
+     "zh": "n. 豆腐",
+     "phonetic": "/ˈtəʊfuː/",
+     "page": 23
+    },
+    {
+     "en": "parrot",
+     "zh": "n. 鹦鹉",
+     "phonetic": "/ˈpærət/",
+     "page": 24
+    },
+    {
+     "en": "guitar",
+     "zh": "n. 吉他",
+     "phonetic": "/ɡɪˈtɑː(r)/",
+     "page": 24
+    },
+    {
+     "en": "tennis",
+     "zh": "n. 网球运动",
+     "phonetic": "/ˈtenɪs/",
+     "page": 24
+    },
+    {
+     "en": "page",
+     "zh": "n. 页面；（书刊或纸张）页",
+     "phonetic": "/peɪdʒ/",
+     "page": 24
+    },
+    {
+     "en": "even",
+     "zh": "adv. 甚至；连；愈加",
+     "phonetic": "/ˈiːvn/",
+     "page": 24
+    },
+    {
+     "en": "hey",
+     "zh": "interj. 嘿；喂",
+     "phonetic": "/heɪ/",
+     "page": 24
+    },
+    {
+     "en": "play the guitar",
+     "zh": "弹吉他",
+     "phonetic": "",
+     "page": 24
+    },
+    {
+     "en": "would (’d)",
+     "zh": "modal v. 想（用于礼貌地邀请或向某人提供某物）；将会",
+     "phonetic": "/wʊd; wəd/",
+     "page": 24
+    },
+    {
+     "en": "would (’d) like to",
+     "zh": "表示愿意、喜欢",
+     "phonetic": "",
+     "page": 24
+    },
+    {
+     "en": "information",
+     "zh": "n. 信息；消息",
+     "phonetic": "/ˌɪnfəˈmeɪʃn/",
+     "page": 25
+    },
+    {
+     "en": "hobby",
+     "zh": "n. 业余爱好",
+     "phonetic": "/ˈhɒbi/",
+     "page": 25
+    },
+    {
+     "en": "re",
+     "zh": "prep. （用于回复电子邮件） 关于；事由",
+     "phonetic": "/riː/",
+     "page": 25
+    },
+    {
+     "en": "Green",
+     "zh": "格林",
+     "phonetic": "/ɡriːn/",
+     "page": 20
+    },
+    {
+     "en": "UK",
+     "zh": "英国",
+     "phonetic": "/ˌjuː ˈkeɪ/",
+     "page": 20
+    },
+    {
+     "en": "US",
+     "zh": "美国",
+     "phonetic": "/ˌjuː ˈes/",
+     "page": 20
+    },
+    {
+     "en": "Smith",
+     "zh": "史密斯",
+     "phonetic": "/smɪθ/",
+     "page": 20
+    },
+    {
+     "en": "Lisa",
+     "zh": "莉萨",
+     "phonetic": "/ˈliːsə/",
+     "page": 23
+    },
+    {
+     "en": "Tom",
+     "zh": "汤姆",
+     "phonetic": "/tɒm/",
+     "page": 23
+    },
+    {
+     "en": "hot pot",
+     "zh": "火锅",
+     "phonetic": "",
+     "page": 23
+    },
+    {
+     "en": "Sally",
+     "zh": "萨莉",
+     "phonetic": "/ˈsæli/",
+     "page": 23
+    },
+    {
+     "en": "Wood",
+     "zh": "伍德",
+     "phonetic": "/wʊd/",
+     "page": 23
+    },
+    {
+     "en": "Sydney",
+     "zh": "悉尼（澳大利亚城市）",
+     "phonetic": "/ˈsɪdni/",
+     "page": 23
+    },
+    {
+     "en": "Australia",
+     "zh": "澳大利亚",
+     "phonetic": "/ɒˈstreɪliə/",
+     "page": 23
+    },
+    {
+     "en": "Mapo tofu",
+     "zh": "麻婆豆腐",
+     "phonetic": "",
+     "page": 23
+    },
+    {
+     "en": "Beijing roast duck",
+     "zh": "北京烤鸭",
+     "phonetic": "/rəʊst/",
+     "page": 24
+    },
+    {
+     "en": "Singapore",
+     "zh": "新加坡",
+     "phonetic": "/ˌsɪŋəˈpɔː(r)/",
+     "page": 24
+    },
+    {
+     "en": "the Great Wall",
+     "zh": "长城",
+     "phonetic": "",
+     "page": 24
+    },
+    {
+     "en": "Pauline",
+     "zh": "保利娜",
+     "phonetic": "/pɔːˈliːn/",
+     "page": 24
+    },
+    {
+     "en": "Lee",
+     "zh": "李",
+     "phonetic": "/liː/",
+     "page": 24
+    },
+    {
+     "en": "Coco",
+     "zh": "科科",
+     "phonetic": "/ˈkəʊkəʊ/",
+     "page": 24
+    },
+    {
+     "en": "London",
+     "zh": "伦敦（英国首都）",
+     "phonetic": "/ˈlʌndən/",
+     "page": 24
+    }
+   ]
+  },
+  {
+   "id": "unit-2",
+   "title": "Unit 2",
+   "words": [
+    {
+     "en": "mean",
+     "zh": "v. 意思是；打算",
+     "phonetic": "/miːn/",
+     "page": 27
+    },
+    {
+     "en": "husband",
+     "zh": "n. 丈夫",
+     "phonetic": "/ˈhʌzbənd/",
+     "page": 28
+    },
+    {
+     "en": "bat",
+     "zh": "n. 球棒；球拍",
+     "phonetic": "/bæt/",
+     "page": 29
+    },
+    {
+     "en": "ping-pong bat",
+     "zh": "乒乓球拍",
+     "phonetic": "",
+     "page": 29
+    },
+    {
+     "en": "play ping-pong",
+     "zh": "打乒乓球",
+     "phonetic": "",
+     "page": 29
+    },
+    {
+     "en": "together",
+     "zh": "adv. 在一起；共同",
+     "phonetic": "/təˈɡeðə(r)/",
+     "page": 29
+    },
+    {
+     "en": "every day",
+     "zh": "每天",
+     "phonetic": "",
+     "page": 29
+    },
+    {
+     "en": "fishing rod",
+     "zh": "钓竿",
+     "phonetic": "/rɒd/",
+     "page": 29
+    },
+    {
+     "en": "spend",
+     "zh": "v. 花（时间、钱等）",
+     "phonetic": "/spend/",
+     "page": 29
+    },
+    {
+     "en": "a lot of / lots of",
+     "zh": "大量；许多",
+     "phonetic": "",
+     "page": 29
+    },
+    {
+     "en": "really",
+     "zh": "adv. 非常；确实；真正地",
+     "phonetic": "/ˈriːəli/",
+     "page": 29
+    },
+    {
+     "en": "member",
+     "zh": "n. 成员；会员",
+     "phonetic": "/ˈmembə(r)/",
+     "page": 30
+    },
+    {
+     "en": "activity",
+     "zh": "n. 活动",
+     "phonetic": "/ækˈtɪvəti/",
+     "page": 30
+    },
+    {
+     "en": "chess",
+     "zh": "n. 国际象棋",
+     "phonetic": "/tʃes/",
+     "page": 30
+    },
+    {
+     "en": "Chinese chess",
+     "zh": "中国象棋",
+     "phonetic": "",
+     "page": 30
+    },
+    {
+     "en": "grandparent",
+     "zh": "n. 祖父（母）；外祖父（母）",
+     "phonetic": "/ˈɡrænpeərənt/",
+     "page": 31
+    },
+    {
+     "en": "funny",
+     "zh": "adj. 好笑的；奇怪的",
+     "phonetic": "/ˈfʌni/",
+     "page": 31
+    },
+    {
+     "en": "laugh",
+     "zh": "v. 笑；发笑 n. 笑声",
+     "phonetic": "/lɑːf/",
+     "page": 31
+    },
+    {
+     "en": "different",
+     "zh": "adj. 不同的",
+     "phonetic": "/ˈdɪfrənt/",
+     "page": 31
+    },
+    {
+     "en": "violin",
+     "zh": "n. 小提琴",
+     "phonetic": "/ˌvaɪəˈlɪn/",
+     "page": 31
+    },
+    {
+     "en": "have fun",
+     "zh": "玩得高兴",
+     "phonetic": "",
+     "page": 31
+    },
+    {
+     "en": "hat",
+     "zh": "n. 帽子",
+     "phonetic": "/hæt/",
+     "page": 32
+    },
+    {
+     "en": "handsome",
+     "zh": "adj. 英俊的",
+     "phonetic": "/ˈhænsəm/",
+     "page": 32
+    },
+    {
+     "en": "knee",
+     "zh": "n. 膝；膝盖",
+     "phonetic": "/niː/",
+     "page": 32
+    },
+    {
+     "en": "at night",
+     "zh": "在夜晚",
+     "phonetic": "",
+     "page": 32
+    },
+    {
+     "en": "in the middle",
+     "zh": "在中间",
+     "phonetic": "",
+     "page": 32
+    },
+    {
+     "en": "grandchild",
+     "zh": "n. ( pl. grandchildren ) （外）孙子；（外）孙女",
+     "phonetic": "/ˈɡræntʃaɪld/ /ˈɡrænˌtʃɪldrən/",
+     "page": 32
+    },
+    {
+     "en": "son",
+     "zh": "n. 儿子",
+     "phonetic": "/sʌn/",
+     "page": 33
+    },
+    {
+     "en": "hike",
+     "zh": "v. & n. 远足；徒步旅行",
+     "phonetic": "/haɪk/",
+     "page": 33
+    },
+    {
+     "en": "go hiking",
+     "zh": "远足；徒步旅行",
+     "phonetic": "",
+     "page": 33
+    },
+    {
+     "en": "next to",
+     "zh": "紧邻；在……近旁",
+     "phonetic": "",
+     "page": 33
+    },
+    {
+     "en": "David",
+     "zh": "戴维",
+     "phonetic": "/ˈdeɪvɪd/",
+     "page": 28
+    },
+    {
+     "en": "Jim",
+     "zh": "吉姆",
+     "phonetic": "/dʒɪm/",
+     "page": 28
+    },
+    {
+     "en": "Kate",
+     "zh": "凯特",
+     "phonetic": "/keɪt/",
+     "page": 31
+    },
+    {
+     "en": "Lily",
+     "zh": "莉莉",
+     "phonetic": "/ˈlɪli/",
+     "page": 32
+    },
+    {
+     "en": "Ireland",
+     "zh": "爱尔兰",
+     "phonetic": "/ˈaɪələnd/",
+     "page": 32
+    },
+    {
+     "en": "Fred",
+     "zh": "弗雷德",
+     "phonetic": "/fred/",
+     "page": 32
+    },
+    {
+     "en": "Sam",
+     "zh": "萨姆",
+     "phonetic": "/sæm/",
+     "page": 32
+    },
+    {
+     "en": "Jane",
+     "zh": "简",
+     "phonetic": "/dʒeɪn/",
+     "page": 32
+    },
+    {
+     "en": "Jack",
+     "zh": "杰克",
+     "phonetic": "/dʒæk/",
+     "page": 32
+    },
+    {
+     "en": "Sarah",
+     "zh": "萨拉",
+     "phonetic": "/ˈseərə/",
+     "page": 32
+    },
+    {
+     "en": "Oscar",
+     "zh": "奥斯卡",
+     "phonetic": "/ˈɒskə(r)/",
+     "page": 32
+    },
+    {
+     "en": "Lucy",
+     "zh": "露西",
+     "phonetic": "/ˈluːsi/",
+     "page": 32
+    }
+   ]
+  },
+  {
+   "id": "unit-3",
+   "title": "Unit 3",
+   "words": [
+    {
+     "en": "hall",
+     "zh": "n. 礼堂；大厅",
+     "phonetic": "/hɔːl/",
+     "page": 36
+    },
+    {
+     "en": "dining hall",
+     "zh": "餐厅",
+     "phonetic": "/ˈdaɪnɪŋ/",
+     "page": 36
+    },
+    {
+     "en": "in front of",
+     "zh": "在……前面",
+     "phonetic": "",
+     "page": 36
+    },
+    {
+     "en": "building",
+     "zh": "n. 建筑物；房子",
+     "phonetic": "/ˈbɪldɪŋ/",
+     "page": 36
+    },
+    {
+     "en": "across",
+     "zh": "adv. & prep. 在（……）对面；横过",
+     "phonetic": "/əˈkrɒs/",
+     "page": 36
+    },
+    {
+     "en": "across from",
+     "zh": "在对面",
+     "phonetic": "",
+     "page": 36
+    },
+    {
+     "en": "centre",
+     "zh": "(= center) n. 中心；中央",
+     "phonetic": "/ˈsentə(r)/",
+     "page": 36
+    },
+    {
+     "en": "gym",
+     "zh": "n. (= gymnasium ) 体育馆，健身房； （尤指学校的）体育活动",
+     "phonetic": "/dʒɪm/ /dʒɪmˈneɪziəm/",
+     "page": 36
+    },
+    {
+     "en": "field",
+     "zh": "n. 场地；田地",
+     "phonetic": "/fiːld/",
+     "page": 36
+    },
+    {
+     "en": "sports field",
+     "zh": "运动场",
+     "phonetic": "",
+     "page": 36
+    },
+    {
+     "en": "office",
+     "zh": "n. 办公室",
+     "phonetic": "/ˈɒfɪs/",
+     "page": 36
+    },
+    {
+     "en": "large",
+     "zh": "adj. 大的；大号的",
+     "phonetic": "/lɑːdʒ/",
+     "page": 37
+    },
+    {
+     "en": "special",
+     "zh": "adj. 特别的；特殊的",
+     "phonetic": "/ˈspeʃl/",
+     "page": 37
+    },
+    {
+     "en": "smart",
+     "zh": "adj. 智能的；聪明的",
+     "phonetic": "/smɑːt/",
+     "page": 37
+    },
+    {
+     "en": "whiteboard",
+     "zh": "n. 白板；白色书写板",
+     "phonetic": "/ˈwaɪtbɔːd/",
+     "page": 37
+    },
+    {
+     "en": "put up",
+     "zh": "张贴；搭建",
+     "phonetic": "",
+     "page": 37
+    },
+    {
+     "en": "important",
+     "zh": "adj. 重要的",
+     "phonetic": "/ɪmˈpɔːtnt/",
+     "page": 37
+    },
+    {
+     "en": "notice",
+     "zh": "n. 通知；注意 v. 注意到；意识到",
+     "phonetic": "/ˈnəʊtɪs/",
+     "page": 37
+    },
+    {
+     "en": "locker",
+     "zh": "n. 有锁存物柜；寄物柜",
+     "phonetic": "/ˈlɒkə(r)/",
+     "page": 37
+    },
+    {
+     "en": "drawer",
+     "zh": "n. 抽屉",
+     "phonetic": "/drɔː(r)/",
+     "page": 37
+    },
+    {
+     "en": "at the back (of)",
+     "zh": "在（……）后面",
+     "phonetic": "",
+     "page": 38
+    },
+    {
+     "en": "corner",
+     "zh": "n. 角；墙角；街角",
+     "phonetic": "/ˈkɔːnə(r)/",
+     "page": 38
+    },
+    {
+     "en": "bookcase",
+     "zh": "n. 书架；书柜",
+     "phonetic": "/ˈbʊkkeɪs/",
+     "page": 39
+    },
+    {
+     "en": "screen",
+     "zh": "n. 屏幕；银幕",
+     "phonetic": "/skriːn/",
+     "page": 39
+    },
+    {
+     "en": "at school",
+     "zh": "在学校",
+     "phonetic": "",
+     "page": 40
+    },
+    {
+     "en": "different from",
+     "zh": "与……不一样",
+     "phonetic": "",
+     "page": 40
+    },
+    {
+     "en": "modern",
+     "zh": "adj. 现代的；当代的",
+     "phonetic": "/ˈmɒdn/",
+     "page": 40
+    },
+    {
+     "en": "do exercises",
+     "zh": "做体操",
+     "phonetic": "",
+     "page": 40
+    },
+    {
+     "en": "amazing",
+     "zh": "adj. 令人惊奇 （惊喜或惊叹）的",
+     "phonetic": "/əˈmeɪzɪŋ/",
+     "page": 40
+    },
+    {
+     "en": "raise",
+     "zh": "v. 使升高；提高",
+     "phonetic": "/reɪz/",
+     "page": 40
+    },
+    {
+     "en": "flag",
+     "zh": "n. 旗；旗帜",
+     "phonetic": "/flæɡ/",
+     "page": 40
+    },
+    {
+     "en": "most",
+     "zh": "adj. & pron. 大多数； 最多；最大 adv. 最",
+     "phonetic": "/məʊst/",
+     "page": 40
+    },
+    {
+     "en": "change",
+     "zh": "v. & n. 改变；变化",
+     "phonetic": "/tʃeɪndʒ/",
+     "page": 40
+    },
+    {
+     "en": "seat",
+     "zh": "n. 座位",
+     "phonetic": "/siːt/",
+     "page": 40
+    },
+    {
+     "en": "delicious",
+     "zh": "adj. 美味的；可口的",
+     "phonetic": "/dɪˈlɪʃəs/",
+     "page": 40
+    },
+    {
+     "en": "How about ...?",
+     "zh": "怎么样？",
+     "phonetic": "",
+     "page": 40
+    },
+    {
+     "en": "yours",
+     "zh": "pron. （通常写作 Yours，用于书信结尾的签名前）你的；您的",
+     "phonetic": "/jɔːz/",
+     "page": 40
+    },
+    {
+     "en": "send",
+     "zh": "v. 发送；邮寄",
+     "phonetic": "/send/",
+     "page": 40
+    },
+    {
+     "en": "similar",
+     "zh": "adj. 类似的；相像的",
+     "phonetic": "/ˈsɪmələ(r)/",
+     "page": 41
+    },
+    {
+     "en": "similar to",
+     "zh": "类似的；相像的",
+     "phonetic": "",
+     "page": 41
+    },
+    {
+     "en": "sound",
+     "zh": "v. 听起来；好像 n. 声音；响声",
+     "phonetic": "/saʊnd/",
+     "page": 41
+    },
+    {
+     "en": "bye for now",
+     "zh": "再见",
+     "phonetic": "",
+     "page": 41
+    },
+    {
+     "en": "Flora",
+     "zh": "弗洛拉",
+     "phonetic": "/ˈflɔːrə/",
+     "page": 40
+    }
+   ]
+  },
+  {
+   "id": "unit-4",
+   "title": "Unit 4",
+   "words": [
+    {
+     "en": "biology",
+     "zh": "n. 生物学",
+     "phonetic": "/baɪˈɒlədʒi/",
+     "page": 44
+    },
+    {
+     "en": "IT",
+     "zh": "(= information technology ) 信息技术",
+     "phonetic": "/ˌaɪ ˈtiː/ /tekˈnɒlədʒi/",
+     "page": 44
+    },
+    {
+     "en": "geography",
+     "zh": "n. 地理（学）",
+     "phonetic": "/dʒiˈɒɡrəfi/",
+     "page": 44
+    },
+    {
+     "en": "history",
+     "zh": "n. 历史；历史课",
+     "phonetic": "/ˈhɪstri/",
+     "page": 44
+    },
+    {
+     "en": "boring",
+     "zh": "adj. 乏味的； 令人生厌的",
+     "phonetic": "/ˈbɔːrɪŋ/",
+     "page": 44
+    },
+    {
+     "en": "useful",
+     "zh": "adj. 有用的；有益的",
+     "phonetic": "/ˈjuːsfl/",
+     "page": 44
+    },
+    {
+     "en": "exciting",
+     "zh": "adj. 令人激动的； 使人兴奋的",
+     "phonetic": "/ɪkˈsaɪtɪŋ/",
+     "page": 44
+    },
+    {
+     "en": "past",
+     "zh": "n. 过去；过去的事情 adj. 过去的 prep. 在……之后",
+     "phonetic": "/pɑːst/",
+     "page": 45
+    },
+    {
+     "en": "good with",
+     "zh": "灵巧的；善于应付……的",
+     "phonetic": "",
+     "page": 45
+    },
+    {
+     "en": "number",
+     "zh": "n. 数字；号码",
+     "phonetic": "/ˈnʌmbə(r)/",
+     "page": 45
+    },
+    {
+     "en": "help sb with",
+     "zh": "帮助某人做（某事）",
+     "phonetic": "",
+     "page": 45
+    },
+    {
+     "en": "reason",
+     "zh": "n. 原因；理由",
+     "phonetic": "/ˈriːzn/",
+     "page": 46
+    },
+    {
+     "en": "listen to",
+     "zh": "听；倾听",
+     "phonetic": "",
+     "page": 47
+    },
+    {
+     "en": "good at",
+     "zh": "擅长",
+     "phonetic": "",
+     "page": 47
+    },
+    {
+     "en": "remember",
+     "zh": "v. 记住；记起",
+     "phonetic": "/rɪˈmembə(r)/",
+     "page": 47
+    },
+    {
+     "en": "as",
+     "zh": "prep. 如同；作为 conj. 当……时；由于",
+     "phonetic": "/æz; əz /",
+     "page": 47
+    },
+    {
+     "en": "AM",
+     "zh": "(= a.m.) 上午",
+     "phonetic": "/ˌeɪ ˈem/",
+     "page": 48
+    },
+    {
+     "en": "PM",
+     "zh": "(= p.m.) 下午；午后",
+     "phonetic": "/ˌpiː ˈem/",
+     "page": 48
+    },
+    {
+     "en": "French",
+     "zh": "n. 法语 adj. 法国的；法国人的；法语的",
+     "phonetic": "/frentʃ/",
+     "page": 48
+    },
+    {
+     "en": "excellent",
+     "zh": "adj. 优秀的；极好的",
+     "phonetic": "/ˈeksələnt/",
+     "page": 48
+    },
+    {
+     "en": "instrument",
+     "zh": "n. 乐器；器械；工具",
+     "phonetic": "/ˈɪnstrəmənt/",
+     "page": 48
+    },
+    {
+     "en": "singer",
+     "zh": "n. 歌手",
+     "phonetic": "/ˈsɪŋə(r)/",
+     "page": 48
+    },
+    {
+     "en": "future",
+     "zh": "n. 将来；未来",
+     "phonetic": "/ˈfjuːtʃə(r)/",
+     "page": 48
+    },
+    {
+     "en": "in the future",
+     "zh": "将来；未来",
+     "phonetic": "",
+     "page": 48
+    },
+    {
+     "en": "term",
+     "zh": "n. 学期",
+     "phonetic": "/tɜːm/",
+     "page": 48
+    },
+    {
+     "en": "work out",
+     "zh": "计算出；解决",
+     "phonetic": "",
+     "page": 48
+    },
+    {
+     "en": "problem",
+     "zh": "n. 难题；困难",
+     "phonetic": "/ˈprɒbləm/",
+     "page": 48
+    },
+    {
+     "en": "in class",
+     "zh": "课堂上",
+     "phonetic": "",
+     "page": 48
+    },
+    {
+     "en": "magic",
+     "zh": "n. 魔法；魔力；魔术 adj. 有魔力的；有神奇力量的",
+     "phonetic": "/ˈmædʒɪk/",
+     "page": 48
+    },
+    {
+     "en": "life",
+     "zh": "n. 生活；生命",
+     "phonetic": "/laɪf/",
+     "page": 48
+    },
+    {
+     "en": "scientist",
+     "zh": "n. 科学家",
+     "phonetic": "/ˈsaɪəntɪst/",
+     "page": 48
+    },
+    {
+     "en": "Baker",
+     "zh": "贝克",
+     "phonetic": "/ˈbeɪkə(r)/",
+     "page": 47
+    },
+    {
+     "en": "Mike",
+     "zh": "迈克",
+     "phonetic": "/maɪk/",
+     "page": 48
+    },
+    {
+     "en": "Davis",
+     "zh": "戴维斯",
+     "phonetic": "/ˈdeɪvɪs/",
+     "page": 48
+    },
+    {
+     "en": "Canada",
+     "zh": "加拿大",
+     "phonetic": "/ˈkænədə/",
+     "page": 48
+    }
+   ]
+  },
+  {
+   "id": "unit-5",
+   "title": "Unit 5",
+   "words": [
+    {
+     "en": "club",
+     "zh": "n. 俱乐部；社团",
+     "phonetic": "/klʌb/",
+     "page": 51
+    },
+    {
+     "en": "join",
+     "zh": "v. 参加；加入",
+     "phonetic": "/dʒɔɪn/",
+     "page": 51
+    },
+    {
+     "en": "choose",
+     "zh": "v. 选择；挑选",
+     "phonetic": "/tʃuːz/",
+     "page": 52
+    },
+    {
+     "en": "drama",
+     "zh": "n. 戏剧；戏剧表演",
+     "phonetic": "/ˈdrɑːmə/",
+     "page": 52
+    },
+    {
+     "en": "play Chinese chess",
+     "zh": "下中国象棋",
+     "phonetic": "",
+     "page": 52
+    },
+    {
+     "en": "feeling",
+     "zh": "n. 感觉；情感",
+     "phonetic": "/ˈfiːlɪŋ/",
+     "page": 52
+    },
+    {
+     "en": "news",
+     "zh": "n. 消息；新闻",
+     "phonetic": "/njuːz/",
+     "page": 53
+    },
+    {
+     "en": "musical",
+     "zh": "adj. 音乐的； 有音乐天赋的",
+     "phonetic": "/ˈmjuːzɪkl/",
+     "page": 53
+    },
+    {
+     "en": "musical instrument",
+     "zh": "乐器",
+     "phonetic": "",
+     "page": 53
+    },
+    {
+     "en": "exactly",
+     "zh": "adv. 正是如此；准确地",
+     "phonetic": "/ɪɡˈzæktli/",
+     "page": 53
+    },
+    {
+     "en": "drum",
+     "zh": "n. 鼓",
+     "phonetic": "/drʌm/",
+     "page": 53
+    },
+    {
+     "en": "ability",
+     "zh": "n. 能力；才能",
+     "phonetic": "/əˈbɪləti/",
+     "page": 54
+    },
+    {
+     "en": "paint",
+     "zh": "v. 用颜料画；在……上 刷油漆 n. 油漆；涂料",
+     "phonetic": "/peɪnt/",
+     "page": 54
+    },
+    {
+     "en": "climb",
+     "zh": "v. 攀登；爬",
+     "phonetic": "/klaɪm/",
+     "page": 55
+    },
+    {
+     "en": "more",
+     "zh": "adj. & pron. 更多（的）",
+     "phonetic": "/mɔː(r)/",
+     "page": 55
+    },
+    {
+     "en": "act",
+     "zh": "v. 扮演；行动 n. （戏剧等）一幕；行动",
+     "phonetic": "/ækt/",
+     "page": 56
+    },
+    {
+     "en": "act out",
+     "zh": "表演",
+     "phonetic": "",
+     "page": 56
+    },
+    {
+     "en": "at home",
+     "zh": "在家里",
+     "phonetic": "",
+     "page": 56
+    },
+    {
+     "en": "interested",
+     "zh": "adj. 感兴趣的",
+     "phonetic": "/ˈɪntrəstɪd/",
+     "page": 56
+    },
+    {
+     "en": "interested in",
+     "zh": "对……感兴趣",
+     "phonetic": "",
+     "page": 56
+    },
+    {
+     "en": "nature",
+     "zh": "n. 自然界；大自然",
+     "phonetic": "/ˈneɪtʃə(r)/",
+     "page": 56
+    },
+    {
+     "en": "beef",
+     "zh": "n. 牛肉",
+     "phonetic": "/biːf/",
+     "page": 56
+    },
+    {
+     "en": "soon",
+     "zh": "adv. 不久；很快",
+     "phonetic": "/suːn/",
+     "page": 56
+    },
+    {
+     "en": "than",
+     "zh": "prep. & conj. （用以引出比较的第二部分）比",
+     "phonetic": "/ðæn; ðən/",
+     "page": 56
+    },
+    {
+     "en": "more than",
+     "zh": "多于",
+     "phonetic": "",
+     "page": 56
+    },
+    {
+     "en": "mind",
+     "zh": "n. 头脑；心思",
+     "phonetic": "/maɪnd/",
+     "page": 56
+    },
+    {
+     "en": "fall",
+     "zh": "v. & n. 进入；掉落；跌倒 n. （美式）秋天",
+     "phonetic": "/fɔːl/",
+     "page": 56
+    },
+    {
+     "en": "fall in love with",
+     "zh": "爱上……",
+     "phonetic": "",
+     "page": 56
+    },
+    {
+     "en": "take photos",
+     "zh": "拍照",
+     "phonetic": "",
+     "page": 56
+    },
+    {
+     "en": "collect",
+     "zh": "v. 收集；采集",
+     "phonetic": "/kəˈlekt/",
+     "page": 56
+    },
+    {
+     "en": "insect",
+     "zh": "n. 昆虫",
+     "phonetic": "/ˈɪnsekt/",
+     "page": 56
+    },
+    {
+     "en": "discover",
+     "zh": "v. 发现；发觉",
+     "phonetic": "/dɪˈskʌvə(r)/",
+     "page": 56
+    },
+    {
+     "en": "wildlife",
+     "zh": "n. 野生动物；野生生物",
+     "phonetic": "/ˈwaɪldlaɪf/",
+     "page": 56
+    },
+    {
+     "en": "Linda",
+     "zh": "琳达",
+     "phonetic": "/ˈlɪndə/",
+     "page": 55
+    },
+    {
+     "en": "Alice",
+     "zh": "爱丽丝",
+     "phonetic": "/ˈælɪs/",
+     "page": 56
+    },
+    {
+     "en": "Bill",
+     "zh": "比尔",
+     "phonetic": "/bɪl/",
+     "page": 56
+    },
+    {
+     "en": "Jenny",
+     "zh": "珍妮",
+     "phonetic": "/ˈdʒeni/",
+     "page": 56
+    }
+   ]
+  },
+  {
+   "id": "unit-6",
+   "title": "Unit 6",
+   "words": [
+    {
+     "en": "make use of",
+     "zh": "使用……；利用……",
+     "phonetic": "",
+     "page": 59
+    },
+    {
+     "en": "quarter",
+     "zh": "n. 一刻钟；四等份之一",
+     "phonetic": "/ˈkwɔːtə(r)/",
+     "page": 60
+    },
+    {
+     "en": "shower",
+     "zh": "n. 淋浴；淋浴器； 阵雨 v. 洗淋浴",
+     "phonetic": "/ˈʃaʊə(r)/",
+     "page": 60
+    },
+    {
+     "en": "take a shower",
+     "zh": "淋浴",
+     "phonetic": "",
+     "page": 60
+    },
+    {
+     "en": "get dressed",
+     "zh": "穿衣服",
+     "phonetic": "",
+     "page": 60
+    },
+    {
+     "en": "brush",
+     "zh": "v. （用刷子）刷 n. 刷子；画笔",
+     "phonetic": "/brʌʃ/",
+     "page": 60
+    },
+    {
+     "en": "tooth",
+     "zh": "n. ( pl. teeth ) 牙齿",
+     "phonetic": "/tuːθ/ /tiːθ/",
+     "page": 60
+    },
+    {
+     "en": "duty",
+     "zh": "n. 值班；职责",
+     "phonetic": "/ˈdjuːti/",
+     "page": 60
+    },
+    {
+     "en": "on duty",
+     "zh": "值班",
+     "phonetic": "",
+     "page": 60
+    },
+    {
+     "en": "usually",
+     "zh": "adv. 通常地；一般地",
+     "phonetic": "/ˈjuːʒuəli/",
+     "page": 60
+    },
+    {
+     "en": "get up",
+     "zh": "起床；站起",
+     "phonetic": "",
+     "page": 60
+    },
+    {
+     "en": "reporter",
+     "zh": "n. 记者",
+     "phonetic": "/rɪˈpɔːtə(r)/",
+     "page": 61
+    },
+    {
+     "en": "around",
+     "zh": "adv. & prep. 大约； 环绕；到处",
+     "phonetic": "/əˈraʊnd/",
+     "page": 61
+    },
+    {
+     "en": "homework",
+     "zh": "n. 家庭作业",
+     "phonetic": "/ˈhəʊmwɜːk/",
+     "page": 61
+    },
+    {
+     "en": "go to bed",
+     "zh": "上床睡觉",
+     "phonetic": "",
+     "page": 61
+    },
+    {
+     "en": "saying",
+     "zh": "n. 谚语；格言",
+     "phonetic": "/ˈseɪɪŋ/",
+     "page": 61
+    },
+    {
+     "en": "rise",
+     "zh": "v. 起床；升起；增长 n. 增加；增强",
+     "phonetic": "/raɪz/",
+     "page": 61
+    },
+    {
+     "en": "stay",
+     "zh": "v. 停留；待",
+     "phonetic": "/steɪ/",
+     "page": 62
+    },
+    {
+     "en": "routine",
+     "zh": "n. 常规",
+     "phonetic": "/ruːˈtiːn/",
+     "page": 62
+    },
+    {
+     "en": "restaurant",
+     "zh": "n. 餐馆；餐厅",
+     "phonetic": "/ˈrestrɒnt/",
+     "page": 63
+    },
+    {
+     "en": "housework",
+     "zh": "n. 家务劳动",
+     "phonetic": "/ˈhaʊswɜːk/",
+     "page": 63
+    },
+    {
+     "en": "while",
+     "zh": "n. 一段时间；一会儿 conj. 在……期间；当……的时候",
+     "phonetic": "/waɪl/",
+     "page": 63
+    },
+    {
+     "en": "weekend",
+     "zh": "n. 周末",
+     "phonetic": "/ˌwiːkˈend/",
+     "page": 63
+    },
+    {
+     "en": "at weekends",
+     "zh": "在周末",
+     "phonetic": "",
+     "page": 63
+    },
+    {
+     "en": "daily",
+     "zh": "adj. 每日的；日常的",
+     "phonetic": "/ˈdeɪli/",
+     "page": 64
+    },
+    {
+     "en": "daily routine",
+     "zh": "日常生活",
+     "phonetic": "",
+     "page": 64
+    },
+    {
+     "en": "only",
+     "zh": "adv. 只；仅",
+     "phonetic": "/ˈəʊnli/",
+     "page": 64
+    },
+    {
+     "en": "break",
+     "zh": "n. 休息；间断 v. （使）破碎；损坏",
+     "phonetic": "/breɪk/",
+     "page": 64
+    },
+    {
+     "en": "Finnish",
+     "zh": "n. 芬兰语 adj. 芬兰的；芬兰人的；芬兰语的",
+     "phonetic": "/ˈfɪnɪʃ/",
+     "page": 64
+    },
+    {
+     "en": "finish",
+     "zh": "v. 结束；完成",
+     "phonetic": "/ˈfɪnɪʃ/",
+     "page": 64
+    },
+    {
+     "en": "hockey",
+     "zh": "n. 曲棍球",
+     "phonetic": "/ˈhɒki/",
+     "page": 64
+    },
+    {
+     "en": "ice hockey",
+     "zh": "冰球运动；冰上曲棍球",
+     "phonetic": "",
+     "page": 64
+    },
+    {
+     "en": "already",
+     "zh": "adv. 已经；早已",
+     "phonetic": "/ɔːlˈredi/",
+     "page": 64
+    },
+    {
+     "en": "dark",
+     "zh": "adj. 昏暗的；深色的",
+     "phonetic": "/dɑːk/",
+     "page": 64
+    },
+    {
+     "en": "outside",
+     "zh": "adv. & prep. 在（……）外面 adj. 外面的",
+     "phonetic": "/ˌaʊtˈsaɪd/",
+     "page": 64
+    },
+    {
+     "en": "part",
+     "zh": "n. 部分",
+     "phonetic": "/pɑːt/",
+     "page": 64
+    },
+    {
+     "en": "everyday",
+     "zh": "adj. 每天的； 日常的",
+     "phonetic": "/ˈevrideɪ/",
+     "page": 64
+    },
+    {
+     "en": "prepare",
+     "zh": "v. 把……预备好； 准备",
+     "phonetic": "/prɪˈpeə(r)/",
+     "page": 64
+    },
+    {
+     "en": "prepare sth for",
+     "zh": "为……把某物准备好",
+     "phonetic": "",
+     "page": 64
+    },
+    {
+     "en": "Timo",
+     "zh": "蒂莫",
+     "phonetic": "/ˈtiːməʊ/",
+     "page": 64
+    },
+    {
+     "en": "Halla",
+     "zh": "哈拉",
+     "phonetic": "/ˈhɑlɑ/",
+     "page": 64
+    },
+    {
+     "en": "Helsinki",
+     "zh": "赫尔辛基（芬兰首都）",
+     "phonetic": "/helˈsɪŋki/",
+     "page": 64
+    },
+    {
+     "en": "Finland",
+     "zh": "芬兰",
+     "phonetic": "/ˈfɪnlənd/",
+     "page": 64
+    },
+    {
+     "en": "home economics",
+     "zh": "家政学；家庭经济学",
+     "phonetic": "/ˌiːkəˈnɒmɪks/",
+     "page": 64
+    }
+   ]
+  },
+  {
+   "id": "unit-7",
+   "title": "Unit 7",
+   "words": [
+    {
+     "en": "celebrate",
+     "zh": "v. 庆祝；庆贺",
+     "phonetic": "/ˈselɪbreɪt/",
+     "page": 67
+    },
+    {
+     "en": "surprise",
+     "zh": "n. 惊奇；惊讶 v. 使感到意外",
+     "phonetic": "/səˈpraɪz/",
+     "page": 69
+    },
+    {
+     "en": "something",
+     "zh": "pron. 某事；某物",
+     "phonetic": "/ˈsʌmθɪŋ/",
+     "page": 69
+    },
+    {
+     "en": "sale",
+     "zh": "n. 出售；销售",
+     "phonetic": "/seɪl/",
+     "page": 69
+    },
+    {
+     "en": "kilo",
+     "zh": "(= kilogram, kilogramme ) n. ( pl. kilos) 千克；公斤",
+     "phonetic": "/ˈkiːləʊ/ /ˈkɪləɡræm/",
+     "page": 69
+    },
+    {
+     "en": "yogurt",
+     "zh": "(= yoghurt) n. 酸奶",
+     "phonetic": "/ˈjɒɡət/",
+     "page": 69
+    },
+    {
+     "en": "total",
+     "zh": "n. 总数；合计 adj. 总的；全体的",
+     "phonetic": "/ˈtəʊtl/",
+     "page": 69
+    },
+    {
+     "en": "price",
+     "zh": "n. 价格",
+     "phonetic": "/praɪs/",
+     "page": 70
+    },
+    {
+     "en": "balloon",
+     "zh": "n. 气球",
+     "phonetic": "/bəˈluːn/",
+     "page": 70
+    },
+    {
+     "en": "chocolate",
+     "zh": "n. 巧克力",
+     "phonetic": "/ˈtʃɒklət/",
+     "page": 70
+    },
+    {
+     "en": "pizza",
+     "zh": "n. 比萨饼",
+     "phonetic": "/ˈpiːtsə/",
+     "page": 70
+    },
+    {
+     "en": "list",
+     "zh": "n. 名单；清单 v. 列表；列清单",
+     "phonetic": "/lɪst/",
+     "page": 70
+    },
+    {
+     "en": "own",
+     "zh": "adj. & pron. 自己的；本人的",
+     "phonetic": "/əʊn/",
+     "page": 71
+    },
+    {
+     "en": "example",
+     "zh": "n. 例子；范例",
+     "phonetic": "/ɪɡˈzɑːmpl/",
+     "page": 71
+    },
+    {
+     "en": "for example",
+     "zh": "例如",
+     "phonetic": "",
+     "page": 71
+    },
+    {
+     "en": "language",
+     "zh": "n. 语言",
+     "phonetic": "/ˈlæŋɡwɪdʒ/",
+     "page": 71
+    },
+    {
+     "en": "international",
+     "zh": "adj. 国际的",
+     "phonetic": "/ˌɪntəˈnæʃnəl/",
+     "page": 71
+    },
+    {
+     "en": "mark",
+     "zh": "v. 做记号；纪念；打分 n. 记号",
+     "phonetic": "/mɑːk/",
+     "page": 71
+    },
+    {
+     "en": "national",
+     "zh": "adj. 国家的；民族的",
+     "phonetic": "/ˈnæʃnəl/",
+     "page": 71
+    },
+    {
+     "en": "found",
+     "zh": "v. 创建；创立",
+     "phonetic": "/faʊnd/",
+     "page": 71
+    },
+    {
+     "en": "meaningful",
+     "zh": "adj. 有意义的；重要的",
+     "phonetic": "/ˈmiːnɪŋfl/",
+     "page": 72
+    },
+    {
+     "en": "make a wish",
+     "zh": "许愿",
+     "phonetic": "",
+     "page": 72
+    },
+    {
+     "en": "celebration",
+     "zh": "n. 庆典；庆祝（活动）",
+     "phonetic": "/ˌselɪˈbreɪʃn/",
+     "page": 72
+    },
+    {
+     "en": "post",
+     "zh": "n. 帖子；邮政 v. 邮寄；发布",
+     "phonetic": "/pəʊst/",
+     "page": 72
+    },
+    {
+     "en": "contact",
+     "zh": "n. 联系；接触 v. 联系；联络",
+     "phonetic": "/ˈkɒntækt/",
+     "page": 72
+    },
+    {
+     "en": "symbol",
+     "zh": "n. 象征；符号",
+     "phonetic": "/ˈsɪmbl/",
+     "page": 72
+    },
+    {
+     "en": "take a photo",
+     "zh": "拍照",
+     "phonetic": "",
+     "page": 72
+    },
+    {
+     "en": "village",
+     "zh": "n. 村庄；村镇",
+     "phonetic": "/ˈvɪlɪdʒ/",
+     "page": 72
+    },
+    {
+     "en": "grow",
+     "zh": "v. 成长；长大；增长",
+     "phonetic": "/ɡrəʊ/",
+     "page": 72
+    },
+    {
+     "en": "blow",
+     "zh": "v. 吹；刮",
+     "phonetic": "/bləʊ/",
+     "page": 72
+    },
+    {
+     "en": "blow out",
+     "zh": "吹灭",
+     "phonetic": "",
+     "page": 72
+    },
+    {
+     "en": "enjoy",
+     "zh": "v. 享受……的乐趣；喜欢",
+     "phonetic": "/ɪnˈdʒɔɪ/",
+     "page": 72
+    },
+    {
+     "en": "height",
+     "zh": "n. 身高；高度",
+     "phonetic": "/haɪt/",
+     "page": 72
+    },
+    {
+     "en": "later",
+     "zh": "adv. & adj. 以后（的）； 后来（的）",
+     "phonetic": "/ˈleɪtə(r)/",
+     "page": 72
+    },
+    {
+     "en": "next time",
+     "zh": "下次",
+     "phonetic": "",
+     "page": 72
+    },
+    {
+     "en": "whom",
+     "zh": "pron. 谁；什么人",
+     "phonetic": "/huːm/",
+     "page": 73
+    },
+    {
+     "en": "William Shakespeare",
+     "zh": "威廉 · 莎士比亚",
+     "phonetic": "/ˈwɪljəm/ /ˈʃeɪkspɪə(r)/",
+     "page": 71
+    },
+    {
+     "en": "Florence Nightingale",
+     "zh": "弗洛伦斯 · 南丁格尔",
+     "phonetic": "/ˈflɒrəns/ /ˈnaɪtɪŋɡeɪl/",
+     "page": 71
+    },
+    {
+     "en": "National Day",
+     "zh": "国庆节",
+     "phonetic": "",
+     "page": 71
+    },
+    {
+     "en": "CPC Founding Day",
+     "zh": "中国共产党建党纪念日",
+     "phonetic": "",
+     "page": 71
+    },
+    {
+     "en": "PLA Day",
+     "zh": "中国人民解放军建军节",
+     "phonetic": "",
+     "page": 71
+    },
+    {
+     "en": "Judy",
+     "zh": "朱迪",
+     "phonetic": "/ˈdʒuːdi/",
+     "page": 72
+    },
+    {
+     "en": "Clark",
+     "zh": "克拉克",
+     "phonetic": "/klɑːk/",
+     "page": 72
+    }
+   ]
+  }
+ ]
+}
