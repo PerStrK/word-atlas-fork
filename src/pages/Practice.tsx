@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { prefetch, useAtlas } from "../atlas/context";
 import type { AudioKind, Entry } from "../atlas/types";
 import { play, stopAudio } from "../lib/audio";
+import { warmWords } from "../lib/warm";
 import { cue } from "../lib/sound";
 import { hashSeed, shuffle, wordKey } from "../lib/text";
 import { clean, correctCharacterCount, same, typingDelta, typingMetrics } from "../lib/typing";
@@ -119,6 +120,9 @@ export function Practice() {
 
 function TypingRound({ mode, entries, onExit, onAgain }: { mode: Mode; entries: Entry[]; onExit: () => void; onAgain: () => void }) {
   const atlas = useAtlas();
+  useEffect(() => {
+    warmWords(atlas, entries.map((e) => e.id));
+  }, [atlas, entries]);
   const settings = useStore((s) => s.settings);
   const [i, setI] = useState(0);
   const [value, setValue] = useState("");

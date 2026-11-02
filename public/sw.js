@@ -1,15 +1,28 @@
-/* Word Atlas offline cache: app shell network-first, everything else cache-first. */
-const VERSION = "atlas-v3";
+/* Word Atlas offline cache: app shell network-first, media cache-first.
+   The media cache has its own stable name so app updates never wipe warmed
+   audio; it is only reset by an explicit media version bump. */
+const VERSION = "atlas-v4";
 const SHELL = `${VERSION}-shell`;
-const MEDIA = `${VERSION}-media`;
+const MEDIA = "atlas-media-v1";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) => Promise.all(keys.filter((k) => !k.startsWith(VERSION)).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim()),
+    (async () => {
+      // Migrate any warmed media from legacy per-version caches.
+      const keys = await caches.keys();
+      const media = await caches.open(MEDIA);
+      for (const key of keys) {
+        if (key.endsWith("-media") && key !== MEDIA) {
+          const legacy = await caches.open(key);
+          for (const req of await legacy.keys()) {
+            if (!(await media.match(req))) await media.put(req, await legacy.match(req));
+          }
+        }
+      }
+      await Promise.all(keys.filter((k) => k !== SHELL && k !== MEDIA).map((k) => caches.delete(k)));
+      await self.clients.claim();
+    })(),
   );
 });
 
@@ -21,10 +34,16 @@ async function trim(name, max) {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-  if (req.method !== "GET" || req.headers.has("range")) return;
+  if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
   if (url.pathname.includes("/api/")) return; // account/progress API: always network
+  const isMediaPath = /\/atlas\/(img|thumb|audio)\//.test(url.pathname);
+  if (req.headers.has("range")) {
+    // Media elements often ask for ranges; a warmed full file plays instantly.
+    if (isMediaPath) event.respondWith(caches.match(req).then((hit) => hit || fetch(req)));
+    return;
+  }
   const isShell = req.mode === "navigate" || url.pathname.endsWith("/index.json") || /\/entries\/\d+\.json$/.test(url.pathname);
   if (isShell) {
     event.respondWith(
@@ -44,8 +63,8 @@ self.addEventListener("fetch", (event) => {
         fetch(req).then((res) => {
           if (res.ok && res.type === "basic") {
             const copy = res.clone();
-            const name = /\/atlas\/(img|thumb|audio)\//.test(url.pathname) ? MEDIA : SHELL;
-            caches.open(name).then((c) => c.put(req, copy)).then(() => name === MEDIA && trim(MEDIA, 1500));
+            const name = isMediaPath ? MEDIA : SHELL;
+            caches.open(name).then((c) => c.put(req, copy)).then(() => name === MEDIA && trim(MEDIA, 8000));
           }
           return res;
         }),

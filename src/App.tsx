@@ -17,6 +17,7 @@ import { store, useStore } from "./store/store";
 import { initSync, syncGlobal } from "./lib/sync";
 import { datasetById, initDatasets, useDatasets } from "./lib/datasets";
 import { ensureSenseBaseline } from "./lib/senses";
+import { scheduleFullWarm } from "./lib/warm";
 import { useVocabAtlas } from "./lib/vocab";
 import { EntryView } from "./ui/EntryView";
 import { AmbienceController, AmbiencePicker } from "./ui/Ambience";
@@ -110,8 +111,12 @@ export default function App() {
 }
 
 function Shell() {
+  const atlas = useAtlas();
   const { active } = useDatasets();
   const { route, word } = useLocation();
+  useEffect(() => {
+    scheduleFullWarm(atlas);
+  }, [atlas]);
   const onboarded = useStore((s) => s.settings.onboarded);
   const theme = useStore((s) => s.settings.theme);
   const [palette, setPalette] = useState(false);

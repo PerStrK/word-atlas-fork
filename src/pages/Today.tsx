@@ -5,6 +5,7 @@ import { useAuth } from "../lib/auth";
 import { go, openWord } from "../lib/router";
 import { refreshVocab, useVocabAtlas } from "../lib/vocab";
 import { senseCoveredBy } from "../lib/senses";
+import { warmWords } from "../lib/warm";
 import { cue } from "../lib/sound";
 import { hashSeed, wordKey } from "../lib/text";
 import { buildSession, masteredCount, todayPlan } from "../store/session";
@@ -48,6 +49,11 @@ export function Today() {
     const t = window.setTimeout(() => void prefetch(atlas, ids), 800);
     return () => window.clearTimeout(t);
   }, [atlas, firstIds]);
+  // Warm the audio for the whole plan so in-session playback is instant.
+  useEffect(() => {
+    const t = window.setTimeout(() => warmWords(atlas, [...plan.due, ...plan.fresh]), 1200);
+    return () => window.clearTimeout(t);
+  }, [atlas, plan]);
   const now = new Date();
   const today = progress.days[dayKey()];
   const streak = streakOf(progress.days);

@@ -5,6 +5,7 @@ import type { Entry, WordRef } from "../atlas/types";
 import { useAuth } from "../lib/auth";
 import { play, stopAudio } from "../lib/audio";
 import { refreshVocab, useVocabAtlas, VOCAB_ID } from "../lib/vocab";
+import { warmWords } from "../lib/warm";
 import { burst } from "../lib/burst";
 import { cue } from "../lib/sound";
 import { go } from "../lib/router";
@@ -65,6 +66,9 @@ function LearnInner() {
   }, [atlas]);
 
   const ids = useMemo(() => [...new Set(session?.steps.map((s) => s.id) ?? [])], [session?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (ids.length) warmWords(atlas, ids);
+  }, [atlas, ids]);
   useEffect(() => {
     if (!ids.length) return;
     let live = true;

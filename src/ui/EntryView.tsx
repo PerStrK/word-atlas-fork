@@ -1,9 +1,11 @@
 import { Bookmark, BookmarkCheck, Lightbulb, Share2 } from "lucide-react";
+import { useEffect } from "react";
 import type { AudioKind, Entry, WordRef } from "../atlas/types";
 import { useAtlas } from "../atlas/context";
 import { splitHighlight, splitPair, wordKey } from "../lib/text";
 import { formatInterval, isMastered } from "../store/srs";
 import { toggleBookmark, useStore } from "../store/store";
+import { warmWords } from "../lib/warm";
 import { Illustration } from "./Illustration";
 import { Speak } from "./Speak";
 import { shareWord } from "./share";
@@ -58,6 +60,9 @@ export function EntryView({ entry, mode = "detail", eager = true }: { entry: Ent
   const card = useStore((s) => s.progress.cards[wordKey(entry.w)]);
   const saved = useStore((s) => s.progress.bookmarks.includes(entry.id));
   const accent = useStore((s) => s.settings.accent);
+  useEffect(() => {
+    warmWords(atlas, [entry.id]);
+  }, [atlas, entry.id]);
   const topicIdx = atlas.topics.findIndex((t) => t[0] === entry.topic);
   const topic = atlas.topics[topicIdx];
   // Example readings follow the accent chosen in settings when a per-accent
