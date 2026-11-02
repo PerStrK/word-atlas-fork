@@ -1,7 +1,7 @@
 /* Word Atlas offline cache: app shell network-first, media cache-first.
    The media cache has its own stable name so app updates never wipe warmed
    audio; it is only reset by an explicit media version bump. */
-const VERSION = "atlas-v8";
+const VERSION = "atlas-v9";
 const SHELL = `${VERSION}-shell`;
 const MEDIA = "atlas-media-v1";
 
@@ -39,6 +39,9 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== location.origin) return;
   if (url.pathname.includes("/api/")) return; // account/progress API: always network
   const isMediaPath = /\/atlas\/(img|thumb|audio)\//.test(url.pathname);
+  // 媒体文件完全不经 SW（atlas-v9）：iPad 上图片经缓存层转发会卡在加载中，
+  // 直连网络最稳。慢一点但必达；若直连后变成字母兜底图，则是设备不解 WebP，与缓存无关。
+  if (isMediaPath) return;
   if (req.headers.has("range")) {
     // Media elements often ask for ranges; a warmed full file plays instantly.
     // 只查媒体缓存本身：全局 caches.match 会扫所有缓存，iOS 上可能慢到图片迟迟不出。
