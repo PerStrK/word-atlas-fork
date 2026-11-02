@@ -2950,6 +2950,11 @@ code {
   gap: 10px;
   justify-items: center;
 }
+/* 「再听一遍」必须浮在全屏透明输入框之上，否则点它永远命中的是输入框（听写重播失效的根源） */
+.typing-zh .link {
+  position: relative;
+  z-index: 1;
+}
 .typing-text {
   font: 400 clamp(22px, 3.6vw, 32px) / 1.6 var(--mono);
   letter-spacing: 0.01em;

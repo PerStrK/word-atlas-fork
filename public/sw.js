@@ -1,7 +1,7 @@
 /* Word Atlas offline cache: app shell network-first, media cache-first.
    The media cache has its own stable name so app updates never wipe warmed
    audio; it is only reset by an explicit media version bump. */
-const VERSION = "atlas-v11";
+const VERSION = "atlas-v12";
 const SHELL = `${VERSION}-shell`;
 const MEDIA = "atlas-media-v1";
 
