@@ -1,28 +1,22 @@
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { useAtlas } from "../atlas/context";
+import { setActive, setEnabled, useDatasets } from "../lib/datasets";
 import { store } from "../store/store";
 
-const LEVELS_IELTS = [
-  ["A2", "基础", "日常词还不太稳"],
-  ["B1", "进阶", "目标 5.5 – 6 分"],
-  ["B2", "中高", "目标 6.5 – 7 分"],
-  ["C1", "高级", "冲刺 7.5 分以上"],
-];
-
-const LEVELS_UNITS = [
-  ["Starter Unit 1", "预备单元一", "从头开始"],
-  ["Unit 1", "第一单元", "预备单元已学完"],
-  ["Unit 2", "第二单元", "第一单元已学完"],
-  ["Unit 4", "第四单元", "前三单元已学完"],
-];
-
 export function Onboarding() {
-  const atlas = useAtlas();
-  const LEVELS = atlas.cefr[0]?.includes("Unit") ? LEVELS_UNITS : LEVELS_IELTS;
-  const [level, setLevel] = useState(1);
+  const { list, enabled, active } = useDatasets();
+  const [ds, setDs] = useState(active);
   const [goal, setGoal] = useState(10);
-  const finish = () => store.settings({ onboarded: true, startLevel: atlas.cefr.indexOf(LEVELS[level][0]), dailyNew: goal });
+  const chosen = list.find((d) => d.id === ds) ?? list[0];
+  const finish = () => {
+    // The journey starts from the chosen dataset: enable it and make it the
+    // active one, starting from its first word.
+    if (chosen) {
+      if (!enabled.includes(chosen.id)) setEnabled([...enabled, chosen.id]);
+      setActive(chosen.id);
+    }
+    store.settings({ onboarded: true, startLevel: 0, dailyNew: goal });
+  };
   return (
     <div className="onboard" role="dialog" aria-modal="true" aria-label="欢迎">
       <div className="onboard-card">
@@ -30,18 +24,18 @@ export function Onboarding() {
         <div className="onboard-body">
           <p className="eyebrow">欢迎来到词光</p>
           <h1 className="display">
-            {atlas.count.toLocaleString()} 颗星，
+            {(chosen?.count ?? 0).toLocaleString()} 颗星，
             <br />
             等你一颗颗点亮。
           </h1>
           <fieldset>
-            <legend>你从哪里出发？</legend>
+            <legend>从哪个词库出发？</legend>
             <div className="choice-grid">
-              {LEVELS.map(([code, name, desc], i) => (
-                <button key={code} className={`choice ${level === i ? "is-on" : ""}`} onClick={() => setLevel(i)} aria-pressed={level === i}>
-                  <span className={`chip chip-level lv-${code}`}>{code}</span>
-                  <b>{name}</b>
-                  <small>{desc}</small>
+              {list.map((d) => (
+                <button key={d.id} className={`choice ${ds === d.id ? "is-on" : ""}`} onClick={() => setDs(d.id)} aria-pressed={ds === d.id}>
+                  <span className="chip">{d.count.toLocaleString()} 词</span>
+                  <b>{d.name}</b>
+                  <small>{d.desc}</small>
                 </button>
               ))}
             </div>

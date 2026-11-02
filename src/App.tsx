@@ -110,6 +110,7 @@ export default function App() {
 }
 
 function Shell() {
+  const { active } = useDatasets();
   const { route, word } = useLocation();
   const onboarded = useStore((s) => s.settings.onboarded);
   const theme = useStore((s) => s.settings.theme);
@@ -186,7 +187,7 @@ function Shell() {
         <footer className="footer">
           <Logo compact />
           <p>
-            一词一画，点亮词汇 · 人教版七年级上册 ·{" "}
+            一词一画，点亮词汇 · {datasetById(active)?.name ?? ""} ·{" "}
             <a href={REPO_URL} target="_blank" rel="noreferrer">
               GitHub
             </a>{" "}
