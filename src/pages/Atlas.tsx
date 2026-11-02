@@ -412,6 +412,7 @@ function VirtualGrid({
               src={atlas.img(w, "thumb")}
               word={w.word}
               topic={w.topic}
+              eager
             />
             <span className="tile-no">
               № {String(w.order + 1).padStart(4, "0")}
@@ -468,6 +469,7 @@ function VirtualList({
               word={w.word}
               topic={w.topic}
               className="row-art"
+              eager
             />
             <span className="row-word" lang="en">
               {w.word}

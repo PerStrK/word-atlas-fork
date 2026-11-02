@@ -1,7 +1,7 @@
 /* Word Atlas offline cache: app shell network-first, media cache-first.
    The media cache has its own stable name so app updates never wipe warmed
    audio; it is only reset by an explicit media version bump. */
-const VERSION = "atlas-v7";
+const VERSION = "atlas-v8";
 const SHELL = `${VERSION}-shell`;
 const MEDIA = "atlas-media-v1";
 
@@ -41,7 +41,12 @@ self.addEventListener("fetch", (event) => {
   const isMediaPath = /\/atlas\/(img|thumb|audio)\//.test(url.pathname);
   if (req.headers.has("range")) {
     // Media elements often ask for ranges; a warmed full file plays instantly.
-    if (isMediaPath) event.respondWith(caches.match(req).then((hit) => hit || fetch(req)));
+    // 只查媒体缓存本身：全局 caches.match 会扫所有缓存，iOS 上可能慢到图片迟迟不出。
+    if (isMediaPath) {
+      event.respondWith(
+        caches.open(MEDIA).then((c) => c.match(req)).then((hit) => hit || fetch(req)),
+      );
+    }
     return;
   }
   const isShell = req.mode === "navigate" || url.pathname.endsWith("/index.json") || /\/entries\/\d+\.json$/.test(url.pathname);
@@ -56,6 +61,23 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
+  if (isMediaPath) {
+    event.respondWith(
+      caches.open(MEDIA).then((media) =>
+        media.match(req).then(
+          (hit) =>
+            hit ||
+            fetch(req).then((res) => {
+              if (res.ok && res.type === "basic") {
+                media.put(req, res.clone()).then(() => trim(MEDIA, 8000)).catch(() => {});
+              }
+              return res;
+            }),
+        ),
+      ),
+    );
+    return;
+  }
   event.respondWith(
     caches.match(req).then(
       (hit) =>
@@ -63,8 +85,7 @@ self.addEventListener("fetch", (event) => {
         fetch(req).then((res) => {
           if (res.ok && res.type === "basic") {
             const copy = res.clone();
-            const name = isMediaPath ? MEDIA : SHELL;
-            caches.open(name).then((c) => c.put(req, copy)).then(() => name === MEDIA && trim(MEDIA, 8000));
+            caches.open(SHELL).then((c) => c.put(req, copy));
           }
           return res;
         }),
