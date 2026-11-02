@@ -1,12 +1,14 @@
 import { ArrowRight, Check, Lightbulb, RotateCcw, Share2, Volume2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { prefetch, useAtlas, useEntry } from "../atlas/context";
+import { AtlasContext, prefetch, useAtlas, useEntry } from "../atlas/context";
 import type { Entry, WordRef } from "../atlas/types";
+import { useAuth } from "../lib/auth";
 import { play, stopAudio } from "../lib/audio";
+import { refreshVocab, useVocabAtlas, VOCAB_ID } from "../lib/vocab";
 import { burst } from "../lib/burst";
 import { cue } from "../lib/sound";
 import { go } from "../lib/router";
-import { gap, normalize } from "../lib/text";
+import { gap, normalize, wordKey } from "../lib/text";
 import { answer, advance, buildSession, gradeFor, sessionStats } from "../store/session";
 import { Rating } from "../store/srs";
 import { store, useStore, type ActiveSession, type QuizKind, type Step } from "../store/store";
@@ -19,6 +21,33 @@ import { Speak } from "../ui/Speak";
 import { shareSession } from "../ui/shareSession";
 
 export function Learn() {
+  const session = useStore((s) => s.progress.session);
+  const { user } = useAuth();
+  const vocab = useVocabAtlas();
+  useEffect(() => {
+    if (user) void refreshVocab();
+  }, [user]);
+  const staleVocab =
+    session?.ds === VOCAB_ID && !!vocab && session.steps.length > 0 && !vocab.byId.has(session.steps[0].id);
+  useEffect(() => {
+    if (!staleVocab) return;
+    // The word set changed under this session (e.g. another account): drop it.
+    store.progress((p) => ({ ...p, session: null }));
+    go({ page: "today" }, null, true);
+  }, [staleVocab]);
+  if (session?.ds === VOCAB_ID) {
+    // A 生词本 session runs against the vocab atlas, not the active dataset.
+    if (!vocab || staleVocab) return <div className="learn learn-loading"><span className="spinner" /></div>;
+    return (
+      <AtlasContext.Provider value={vocab}>
+        <LearnInner />
+      </AtlasContext.Provider>
+    );
+  }
+  return <LearnInner />;
+}
+
+function LearnInner() {
   const atlas = useAtlas();
   const session = useStore((s) => s.progress.session);
   const [ready, setReady] = useState(false);
@@ -92,6 +121,12 @@ function Intro({ step }: { step: Step }) {
   const atlas = useAtlas();
   const { entry } = useEntry(step.id);
   const settings = useStore((s) => s.settings);
+  // An intro for a word that already has a card is a sense top-up, not a
+  // first meeting: this dataset gives the word new senses.
+  const hasCard = useStore((s) => {
+    const ref = atlas.byId.get(step.id);
+    return !!ref && !!s.progress.cards[wordKey(ref.word)];
+  });
   const elapsed = useStepTimer();
   useEffect(() => {
     if (entry && settings.autoplay) void play(atlas.audio(entry, settings.accent), entry.w, settings.accent);
@@ -106,7 +141,7 @@ function Intro({ step }: { step: Step }) {
   return (
     <div className="intro">
       <p className="stage-label">
-        <span className="dot dot-new" /> 初次见面
+        <span className="dot dot-new" /> {hasCard ? "新词义 · 再认识一下" : "初次见面"}
       </p>
       <EntryView entry={entry} mode="intro" />
       <footer className="learn-actions">

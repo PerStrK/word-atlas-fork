@@ -1,11 +1,15 @@
 import { Grid3x3, List, Search, Sparkles, X } from "lucide-react";
 import { Galaxy } from "../galaxy/Galaxy";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useAtlas } from "../atlas/context";
+import { AtlasContext, useAtlas } from "../atlas/context";
 import type { WordRef } from "../atlas/types";
+import { useAuth } from "../lib/auth";
+import { datasetById, useDatasets } from "../lib/datasets";
 import { morphFrom } from "../lib/motion";
 import { go, openWord, type Route } from "../lib/router";
+import { refreshVocab, useVocabAtlas } from "../lib/vocab";
 import { wordKey } from "../lib/text";
+import { senseCoveredBy } from "../lib/senses";
 import { isMastered } from "../store/srs";
 import { useStore } from "../store/store";
 import { Illustration } from "../ui/Illustration";
@@ -36,8 +40,40 @@ export function AtlasPage({
 }: {
   route: Extract<Route, { page: "atlas" }>;
 }) {
+  const { user } = useAuth();
+  const vocab = useVocabAtlas();
+  useEffect(() => {
+    if (user) void refreshVocab();
+  }, [user]);
+  if (route.view === "vocab") {
+    if (vocab)
+      return (
+        <AtlasContext.Provider value={vocab}>
+          <AtlasInner route={route} vocabMode />
+        </AtlasContext.Provider>
+      );
+    return (
+      <div className="page atlas">
+        <span className="spinner" />
+      </div>
+    );
+  }
+  return <AtlasInner route={route} />;
+}
+
+function AtlasInner({
+  route,
+  vocabMode,
+}: {
+  route: Extract<Route, { page: "atlas" }>;
+  vocabMode?: boolean;
+}) {
   const atlas = useAtlas();
+  const { user } = useAuth();
+  const { active } = useDatasets();
+  const datasetName = datasetById(active)?.name ?? "词库";
   const cards = useStore((s) => s.progress.cards);
+  const senses = useStore((s) => s.progress.senses);
   const bookmarks = useStore((s) => s.progress.bookmarks);
   const [q, setQ] = useState(route.q ?? "");
   const [status, setStatus] = useState<Status>("all");
@@ -52,6 +88,7 @@ export function AtlasPage({
   }, [route.view]);
   const setView = (v: View) => {
     setViewState(v);
+    if (vocabMode) return; // in 生词本 mode the ?view= param means "vocab"; keep it
     go(
       {
         page: "atlas",
@@ -63,6 +100,7 @@ export function AtlasPage({
       true,
     );
   };
+  const effView: View = vocabMode && view === "galaxy" ? "grid" : view;
   const topic = route.topic;
   const level = route.level;
 
@@ -83,29 +121,44 @@ export function AtlasPage({
       if (ti >= 0 && w.topic !== ti) return false;
       if (li >= 0 && w.cefr !== li) return false;
       const c = cards[wordKey(w.word)];
+      // A mastered card whose senses in this dataset are new still counts as
+      // learning here: the new senses have not been covered yet.
+      const masteredHere = !!c && isMastered(c) && senseCoveredBy(senses, atlas.series, w);
       if (status === "new") return !c;
-      if (status === "learning") return !!c && !isMastered(c);
-      if (status === "mastered") return isMastered(c);
+      if (status === "learning") return !!c && !masteredHere;
+      if (status === "mastered") return masteredHere;
       if (status === "saved") return saved.has(w.id);
       return true;
     });
-  }, [atlas, q, topic, level, status, cards, bookmarks]);
+  }, [atlas, q, topic, level, status, cards, senses, bookmarks]);
 
   const setFilter = (patch: Partial<Extract<Route, { page: "atlas" }>>) =>
     go({ page: "atlas", topic, level, view: route.view, ...patch }, null, true);
 
   return (
-    <div className={`page atlas ${view === "galaxy" ? "is-galaxy" : ""}`}>
+    <div className={`page atlas ${effView === "galaxy" ? "is-galaxy" : ""}`}>
       <header className="atlas-head">
         <div>
           <p className="eyebrow">图鉴 · {atlas.count.toLocaleString()} 词</p>
           <h1 className="display">
-            每个词，
-            <br className="br-sm" />
-            都有一幅画。
+            {vocabMode ? (
+              <>
+                读过的书，
+                <br className="br-sm" />
+                留下的词。
+              </>
+            ) : (
+              <>
+                每个词，
+                <br className="br-sm" />
+                都有一幅画。
+              </>
+            )}
           </h1>
           <p className="lede">
-            {atlas.examples.toLocaleString()} 条原创例句 · 英美发音 · {atlas.cefr[0]?.includes("Unit") ? "按单元和" : "按难度和"} {atlas.topics.length} 个话题整理
+            {vocabMode
+              ? "来自阅读空间的生词本 · 不随词库切换 · 学过的词在所有词库里都算数"
+              : `${atlas.examples.toLocaleString()} 条原创例句 · 英美发音 · ${atlas.cefr[0]?.includes("Unit") ? "按单元和" : "按难度和"} ${atlas.topics.length} 个话题整理`}
           </p>
         </div>
         <label className="search">
@@ -129,8 +182,27 @@ export function AtlasPage({
         </label>
       </header>
 
+      {user && (
+        <div className="segmented" role="group" aria-label="词来源" style={{ marginBottom: 14 }}>
+          <button
+            className={!vocabMode ? "is-on" : ""}
+            onClick={() => go({ page: "atlas" }, null, true)}
+            aria-pressed={!vocabMode}
+          >
+            {datasetName}
+          </button>
+          <button
+            className={vocabMode ? "is-on" : ""}
+            onClick={() => go({ page: "atlas", view: "vocab" }, null, true)}
+            aria-pressed={!!vocabMode}
+          >
+            生词本
+          </button>
+        </div>
+      )}
+
       <div className="filters">
-        {view !== "galaxy" && (
+        {effView !== "galaxy" && (
           <>
             <div className="chips chips-scroll" role="group" aria-label={atlas.cefr[0]?.includes("Unit") ? "单元" : "难度"}>
               <button
@@ -173,7 +245,7 @@ export function AtlasPage({
           </>
         )}
         <div className="filters-row">
-          {view !== "galaxy" && (
+          {effView !== "galaxy" && (
             <div className="segmented" role="group" aria-label="学习状态">
               {STATUS.map(([k, label]) => (
                 <button
@@ -188,7 +260,7 @@ export function AtlasPage({
             </div>
           )}
           <span className="result-count">
-            {view === "galaxy"
+            {effView === "galaxy"
               ? "搜索一个词，星图会带你飞过去"
               : `${list.length.toLocaleString()} 个结果`}
           </span>
@@ -198,44 +270,46 @@ export function AtlasPage({
             aria-label="视图"
           >
             <button
-              className={view === "grid" ? "is-on" : ""}
+              className={effView === "grid" ? "is-on" : ""}
               onClick={() => setView("grid")}
               aria-label="图片视图"
-              aria-pressed={view === "grid"}
+              aria-pressed={effView === "grid"}
             >
               <Grid3x3 size={17} />
             </button>
             <button
-              className={view === "list" ? "is-on" : ""}
+              className={effView === "list" ? "is-on" : ""}
               onClick={() => setView("list")}
               aria-label="列表视图"
-              aria-pressed={view === "list"}
+              aria-pressed={effView === "list"}
             >
               <List size={17} />
             </button>
-            <button
-              className={view === "galaxy" ? "is-on" : ""}
-              onClick={() => setView("galaxy")}
-              aria-label="星图视图"
-              aria-pressed={view === "galaxy"}
-            >
-              <Sparkles size={17} />
-            </button>
+            {!vocabMode && (
+              <button
+                className={effView === "galaxy" ? "is-on" : ""}
+                onClick={() => setView("galaxy")}
+                aria-label="星图视图"
+                aria-pressed={effView === "galaxy"}
+              >
+                <Sparkles size={17} />
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {view === "galaxy" ? (
+      {effView === "galaxy" ? (
         <Galaxy mode="full" focus={q.trim() ? list[0]?.id : null} />
       ) : list.length === 0 ? (
         <div className="empty">
           <img src={`${import.meta.env.BASE_URL}brand/empty.webp`} alt="" />
           <p>这片星域还没有词。换个筛选条件试试。</p>
         </div>
-      ) : view === "grid" ? (
-        <VirtualGrid items={list} cards={cards} />
+      ) : effView === "grid" ? (
+        <VirtualGrid items={list} cards={cards} senses={senses} />
       ) : (
-        <VirtualList items={list} cards={cards} />
+        <VirtualList items={list} cards={cards} senses={senses} />
       )}
     </div>
   );
@@ -293,9 +367,11 @@ function useWidth(ref: React.RefObject<HTMLDivElement | null>) {
 function VirtualGrid({
   items,
   cards,
+  senses,
 }: {
   items: WordRef[];
   cards: Record<string, { s: number; st: number }>;
+  senses?: Record<string, string[]>;
 }) {
   const atlas = useAtlas();
   const box = useRef<HTMLDivElement>(null);
@@ -317,7 +393,7 @@ function VirtualGrid({
         if (!w) break;
         const card = cards[wordKey(w.word)];
         const st = card
-          ? card.st === 2 && card.s >= 21
+          ? card.st === 2 && card.s >= 21 && senseCoveredBy(senses, atlas.series, w)
             ? "is-mastered"
             : "is-learning"
           : "";
@@ -362,9 +438,11 @@ function VirtualGrid({
 function VirtualList({
   items,
   cards,
+  senses,
 }: {
   items: WordRef[];
   cards: Record<string, { s: number; st: number }>;
+  senses?: Record<string, string[]>;
 }) {
   const atlas = useAtlas();
   const accent = useStore((s) => s.settings.accent);
@@ -397,7 +475,7 @@ function VirtualList({
             <span className="row-ipa ipa">{w.ipa}</span>
             <span className="row-zh">{w.zh}</span>
             <span
-              className={`row-dot ${card ? (card.st === 2 && card.s >= 21 ? "is-mastered" : "is-learning") : ""}`}
+              className={`row-dot ${card ? (card.st === 2 && card.s >= 21 && senseCoveredBy(senses, atlas.series, w) ? "is-mastered" : "is-learning") : ""}`}
             />
             <Speak
               url={atlas.audio(w, accent)}

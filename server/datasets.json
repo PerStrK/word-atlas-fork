@@ -1,1 +1,1 @@
-{"datasets": [{"count": 333, "desc": "教学词库 · 2024 新版七上课本词", "id": "pep-g7s1-atlas", "name": "人教版七上", "root": "atlas"}, {"count": 7298, "desc": "IELTS 核心词 · 一词一画", "id": "word-atlas-open", "name": "雅思词库", "root": "datasets/ielts/atlas"}]}
+{"datasets":[{"count":333,"desc":"教学词库 · 2024 新版七上课本词","id":"pep-g7s1-atlas","name":"人教版七上","root":"atlas","series":"pep"},{"count":7298,"desc":"IELTS 核心词 · 一词一画","id":"word-atlas-open","name":"雅思词库","root":"datasets/ielts/atlas","series":"ielts"}]}

@@ -1,5 +1,6 @@
 import type { Atlas, WordRef } from "../atlas/types";
 import { MEDIA } from "../atlas/types";
+import { isSenseNew, senseTag } from "../lib/senses";
 import { hashSeed, normalize, shuffle, wordKey } from "../lib/text";
 import { isMastered, review, Rating, type Grade } from "./srs";
 import { bumpDay, dayKey, store, type ActiveSession, type Progress, type QuizKind, type Settings, type Step } from "./store";
@@ -15,13 +16,16 @@ export function newToday(p: Progress) {
   return p.days[dayKey()]?.n ?? 0;
 }
 
-/** Next unseen words along the learning path, starting at the learner's level. */
+/** Next new words along the learning path, starting at the learner's level.
+ *  "New" includes sense-new words: learned elsewhere in the series, but this
+ *  dataset's senses for them were never covered (see lib/senses). */
 export function nextNew(atlas: Atlas, p: Progress, settings: Settings, count: number) {
   const out: string[] = [];
   const pass = (from: number) => {
     for (const w of atlas.words) {
       if (out.length >= count) return;
-      if (w.cefr < from || p.cards[wordKey(w.word)] || out.includes(w.id)) continue;
+      if (w.cefr < from || out.includes(w.id)) continue;
+      if (p.cards[wordKey(w.word)] && !isSenseNew(atlas, p, w)) continue;
       out.push(w.id);
     }
   };
@@ -36,7 +40,11 @@ export function todayPlan(atlas: Atlas, p: Progress, s: Settings) {
     const k = wordKey(w.word);
     if (!keyToId.has(k)) keyToId.set(k, w.id);
   }
-  const due = dueIds(p).filter((k) => keyToId.has(k)).map((k) => keyToId.get(k)!);
+  // Sense-new words are re-introduced as new material, not as due reviews.
+  const due = dueIds(p)
+    .filter((k) => keyToId.has(k))
+    .map((k) => keyToId.get(k)!)
+    .filter((id) => !isSenseNew(atlas, p, atlas.byId.get(id)!));
   const newLeft = Math.max(0, s.dailyNew - newToday(p));
   const fresh = nextNew(atlas, p, s, newLeft);
   return { due, fresh, minutes: Math.max(1, Math.round(due.length * 0.25 + fresh.length * 0.9)) };
@@ -95,8 +103,12 @@ export function buildSession(atlas: Atlas, p: Progress, s: Settings, opts?: { id
     const r = atlas.byId.get(id);
     return !!r && !!p.cards[wordKey(r.word)];
   };
-  const reviewIds = opts?.ids ? opts.ids.filter(hasCard) : plan.due.slice(0, 120);
-  const newIds = opts?.ids ? opts.ids.filter((id) => !hasCard(id)) : opts?.reviewOnly ? [] : plan.fresh;
+  const isNew = (id: string) => {
+    const r = atlas.byId.get(id);
+    return !!r && (!hasCard(id) || isSenseNew(atlas, p, r));
+  };
+  const reviewIds = opts?.ids ? opts.ids.filter((id) => hasCard(id) && !isNew(id)) : plan.due.slice(0, 120);
+  const newIds = opts?.ids ? opts.ids.filter(isNew) : opts?.reviewOnly ? [] : plan.fresh;
   const steps: Step[] = [];
   const quiz = (id: string, salt: number): Step => {
     const ref = atlas.byId.get(id)!;
@@ -127,7 +139,8 @@ export function gradeFor(kind: QuizKind, correct: boolean, ms: number, hinted: b
 /** Apply an answer. Only the first attempt for a word in a session updates memory and stats. */
 export function answer(atlas: Atlas, step: Step & { kind: QuizKind }, correct: boolean, grade: Grade, value: string) {
   const { settings } = store.get();
-  const stepKey = wordKey(atlas.byId.get(step.id)!.word);
+  const stepRef = atlas.byId.get(step.id)!;
+  const stepKey = wordKey(stepRef.word);
   store.progress((p) => {
     const sess = p.session;
     if (!sess) return p;
@@ -140,6 +153,13 @@ export function answer(atlas: Atlas, step: Step & { kind: QuizKind }, correct: b
         session: { ...next.session!, graded: { ...sess.graded, [step.id]: grade } },
         mistakes: correct ? next.mistakes : [step.id, ...next.mistakes.filter((x) => x !== step.id)].slice(0, 300),
       };
+      // A word met as new material (brand-new or a sense top-up) records this
+      // dataset series' sense signature as covered.
+      if (atlas.series && sess.newIds.includes(step.id)) {
+        const tag = senseTag(atlas.series, stepRef.zh);
+        const tags = next.senses?.[stepKey] ?? [];
+        if (!tags.includes(tag)) next = { ...next, senses: { ...(next.senses ?? {}), [stepKey]: [...tags, tag] } };
+      }
       next = bumpDay(next, { r: 1, c: correct ? 1 : 0, n: sess.newIds.includes(step.id) ? 1 : 0 });
     }
     if (!correct) {

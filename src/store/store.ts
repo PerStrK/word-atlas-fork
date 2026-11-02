@@ -47,6 +47,9 @@ export interface Progress {
   session: ActiveSession | null;
   /** Rolling list of recent mistakes, newest first. */
   mistakes: string[];
+  /** Sense coverage per word key: "series:signature" tags for glosses the
+   *  learner has covered in each dataset series (see lib/senses). */
+  senses?: Record<string, string[]>;
 }
 
 export interface Settings {
@@ -90,6 +93,7 @@ export const emptyProgress = (datasetId: string): Progress => ({
   typing: [],
   session: null,
   mistakes: [],
+  senses: {},
 });
 
 export const dayKey = (d = new Date()) =>
@@ -146,6 +150,12 @@ export function sanitizeProgress(v: unknown, datasetId: string): Progress {
   if (isObj(v.cards)) for (const [k, c] of Object.entries(v.cards)) if (validCard(c)) out.cards[k] = c;
   if (Array.isArray(v.bookmarks)) out.bookmarks = v.bookmarks.filter((x): x is string => typeof x === "string").slice(0, 20000);
   if (Array.isArray(v.mistakes)) out.mistakes = v.mistakes.filter((x): x is string => typeof x === "string").slice(0, 300);
+  if (isObj(v.senses))
+    for (const [k, tags] of Object.entries(v.senses))
+      if (Array.isArray(tags)) {
+        const clean = tags.filter((x): x is string => typeof x === "string").slice(0, 50);
+        if (clean.length) (out.senses ??= {})[k] = clean;
+      }
   if (isObj(v.days))
     for (const [k, d] of Object.entries(v.days))
       if (/^\d{4}-\d{2}-\d{2}$/.test(k) && isObj(d) && num(d.n, 0) && num(d.r, 0) && num(d.c, 0) && num(d.t, 0))

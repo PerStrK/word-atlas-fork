@@ -8,11 +8,13 @@ export interface DatasetInfo {
   desc: string;
   root: string;
   count: number;
+  /** Sense-coverage series; datasets sharing a series compare glosses. */
+  series?: string;
 }
 
 export const DEFAULT_DATASET = "pep-g7s1-atlas";
 const FALLBACK: DatasetInfo[] = [
-  { id: DEFAULT_DATASET, name: "人教版七上", desc: "教学词库 · 七年级上册课本词", root: "atlas", count: 423 },
+  { id: DEFAULT_DATASET, name: "人教版七上", desc: "教学词库 · 七年级上册课本词", root: "atlas", count: 423, series: "pep" },
 ];
 const LS_ENABLED = "word-atlas:enabled-datasets";
 const LS_ACTIVE = "word-atlas:active-dataset";

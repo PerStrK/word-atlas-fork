@@ -54,6 +54,9 @@ export interface Atlas {
   id: string;
   name: string;
   kind: "open" | "private";
+  /** Sense-coverage series (e.g. "pep" for the textbook series); datasets in
+   *  the same series check each other's glosses for new senses. */
+  series?: string;
   count: number;
   examples: number;
   illustrated: number;

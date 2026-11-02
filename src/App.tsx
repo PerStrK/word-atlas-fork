@@ -16,6 +16,8 @@ import { cue } from "./lib/sound";
 import { store, useStore } from "./store/store";
 import { initSync, syncGlobal } from "./lib/sync";
 import { datasetById, initDatasets, useDatasets } from "./lib/datasets";
+import { ensureSenseBaseline } from "./lib/senses";
+import { useVocabAtlas } from "./lib/vocab";
 import { EntryView } from "./ui/EntryView";
 import { AmbienceController, AmbiencePicker } from "./ui/Ambience";
 import { Logo } from "./ui/Logo";
@@ -62,11 +64,15 @@ export default function App() {
     loadAtlas(info.root).then(
       (a) => {
         if (cancelled) return;
+        a.series = info.series ?? a.id;
         atlasRef.current = a;
         store.useDataset(a.id);
         store.migrateLegacy(a);
         setAtlas(a);
-        void syncGlobal();
+        // Baseline after the reconcile: filling sense records mutates the
+        // pool, and a mutation must never make a stale local copy look
+        // newer than a server copy that has not been adopted yet.
+        void syncGlobal().then(() => ensureSenseBaseline());
       },
       (e: Error) => {
         if (cancelled) return;
@@ -211,6 +217,18 @@ function Shell() {
 }
 
 function WordSheet({ id }: { id: string | null }) {
+  const base = useAtlas();
+  const vocab = useVocabAtlas();
+  // Words that only exist in the 生词本 resolve against the vocab atlas.
+  const atlas = id && !base.byId.has(id) && vocab?.byId.has(id) ? vocab : base;
+  return (
+    <AtlasContext.Provider value={atlas}>
+      <WordSheetInner id={id} />
+    </AtlasContext.Provider>
+  );
+}
+
+function WordSheetInner({ id }: { id: string | null }) {
   const atlas = useAtlas();
   const opened = id !== null;
   useEffect(() => {

@@ -131,6 +131,146 @@ def completed_stages(ds: str, cards: dict) -> int:
     return n
 
 
+# ---- reading-space vocab sync ("生词本", a permanent per-user word set) ----
+# The reading-space app (same box, same usernames) keeps a vocab table in its
+# local D1 sqlite. We read it live, read-only, on every /api/vocab request, so
+# words a user saves while reading show up in Word Atlas with no import step.
+# Words that exist in a library dataset borrow that entry (senses, examples,
+# media); the sentence the word was found in is prepended as an example.
+READSPACE_DB = Path("/data/work/readspace/.wrangler/state/v3/d1/"
+                    "miniflare-D1DatabaseObject/"
+                    "9ba2b04bf514d9facfd57ed57d849e77241a7adc99d1c1545d06688b43d84248.sqlite")
+VOCAB_ID = "reading-vocab"
+_entry_map = None
+_vocab_topics = None
+
+
+def _load_entry_map():
+    """word_key -> (root, entry, {zh, ipa, cefr, topic, media}) over all datasets.
+
+    First dataset in the manifest wins on overlap (the textbook library is
+    listed first, so its glosses are preferred for a school user).
+    """
+    global _entry_map, _vocab_topics
+    if _entry_map is not None:
+        return _entry_map
+    m = {}
+    topics = None
+    for d in manifest_datasets():
+        try:
+            base = WEBROOT.joinpath(*d["root"].split("/"))
+            idx = json.loads((base / "index.json").read_text(encoding="utf-8"))
+            fi = {f: i for i, f in enumerate(idx["fields"])}
+            if topics is None:
+                topics = [list(t) for t in idx["topics"]]
+            rows = {r[fi["id"]]: r for r in idx["words"]}
+            entries_dir = base / "entries"
+            if not entries_dir.is_dir():
+                continue
+            for cf in sorted(entries_dir.glob("*.json")):
+                for e in json.loads(cf.read_text(encoding="utf-8")):
+                    r = rows.get(e["id"])
+                    if not r:
+                        continue
+                    k = word_key(e["w"])
+                    if k in m:
+                        continue
+                    m[k] = (d["root"], e, {
+                        "zh": r[fi["zh"]], "ipa": r[fi["ipa"]],
+                        "cefr": idx["cefr"][r[fi["cefr"]]],
+                        "topic": idx["topics"][r[fi["topic"]]][0],
+                        "media": r[fi["media"]]})
+        except Exception as ex:
+            print(f"vocab entry map failed for {d.get('id')}: {ex}", flush=True)
+    _entry_map = m
+    _vocab_topics = topics or [["daily", "日常"]]
+    return m
+
+
+def build_vocab_payload(username):
+    """The caller's reading-space vocab as a private-atlas payload."""
+    _load_entry_map()
+    out = {"id": VOCAB_ID, "name": "生词本",
+           "topics": _vocab_topics or [["daily", "日常"]],
+           "words": []}
+    try:
+        conn = sqlite3.connect(f"file:{READSPACE_DB}?mode=ro", uri=True, timeout=5)
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            "SELECT word, book, sentence, translation, hits, last_at, mastered "
+            "FROM vocab WHERE user = ? ORDER BY last_at DESC", (username,)).fetchall()
+        sent_zh = {}
+        try:
+            for s in conn.execute("SELECT src, dst FROM sentences WHERE user = ?",
+                                  (username,)).fetchall():
+                sent_zh[s["src"]] = s["dst"]
+        except Exception:
+            pass
+        conn.close()
+    except Exception as ex:
+        print(f"vocab read failed for {username}: {ex}", flush=True)
+        return out
+    emap = _load_entry_map()
+    agg = {}
+    order = []
+    for r in rows:
+        k = word_key(r["word"])
+        if not k:
+            continue
+        a = agg.get(k)
+        if a is None:
+            a = agg[k] = {"word": r["word"], "book": r["book"] or "",
+                          "sentence": r["sentence"] or "",
+                          "translation": r["translation"] or "",
+                          "hits": 0, "mastered": 0}
+            order.append(k)
+        a["hits"] += int(r["hits"] or 1)
+        a["mastered"] = max(a["mastered"], int(r["mastered"] or 0))
+    import copy as _copy
+    for k in order:
+        a = agg[k]
+        prov = ""
+        if a["book"]:
+            prov = f"来自阅读空间《{a['book']}》"
+        if a["hits"] > 1:
+            prov = (prov + " · " if prov else "") + f"查过 {a['hits']} 次"
+        if a["mastered"]:
+            prov = (prov + " · " if prov else "") + "阅读空间里已标掌握"
+        book_ex = None
+        if a["sentence"]:
+            book_ex = {"en": a["sentence"], "zh": sent_zh.get(a["sentence"], "")}
+        hit = emap.get(k)
+        if hit:
+            root, raw_entry, meta = hit
+            e = _copy.deepcopy(raw_entry)
+            if book_ex:
+                e["ex"] = [book_ex] + list(e.get("ex") or [])[:2]
+            if prov and not e.get("note"):
+                e["note"] = prov
+            bits = int(meta["media"])
+            e["media"] = {
+                "img": f"/{root}/img/{e['id']}.webp" if bits & 1 else None,
+                "uk": f"/{root}/audio/uk/{e['id']}.mp3" if bits & 2 else None,
+                "us": f"/{root}/audio/us/{e['id']}.mp3" if bits & 4 else None,
+                "ex": None, "ex2": None}
+            out["words"].append({
+                "id": e["id"], "word": e["w"], "zh": meta["zh"], "ipa": meta["ipa"],
+                "cefr": meta["cefr"], "topic": meta["topic"],
+                "media": bits & ~24, "entry": e})
+        else:
+            slug = re.sub(r"[^a-z0-9]+", "-", k).strip("-") or "word"
+            e = {"id": f"vocab-{slug}", "w": a["word"], "uk": "", "us": "",
+                 "senses": [{"pos": "", "zh": a["translation"] or "（暂无释义）", "en": ""}],
+                 "ex": [book_ex] if book_ex else [],
+                 "col": [], "fam": [], "syn": [], "ant": [], "tip": "",
+                 "cefr": "生词", "topic": "daily", "note": prov or None, "m": 0,
+                 "media": {"img": None, "uk": None, "us": None, "ex": None, "ex2": None}}
+            out["words"].append({
+                "id": e["id"], "word": a["word"], "zh": a["translation"],
+                "ipa": "", "cefr": "生词", "topic": "daily", "media": 0, "entry": e})
+    return out
+
+
 def manifest_datasets():
     """Dataset manifest: edit datasets.json next to this file to add a library."""
     try:
@@ -140,7 +280,8 @@ def manifest_datasets():
             if isinstance(d, dict) and d.get("id") and d.get("root"):
                 out.append({"id": str(d["id"]), "name": str(d.get("name") or d["id"]),
                             "desc": str(d.get("desc") or ""), "root": str(d["root"]),
-                            "count": int(d.get("count") or 0)})
+                            "count": int(d.get("count") or 0),
+                            "series": str(d.get("series") or "")})
         if out:
             return out
     except Exception:
@@ -314,6 +455,11 @@ class H(BaseHTTPRequestHandler):
             return self._send(200, {"ok": True})
         if path == "/api/datasets":
             return self._send(200, {"datasets": manifest_datasets()})
+        if path == "/api/vocab":
+            user = self._session_user()
+            if not user:
+                return self._send(401, {"error": "请先登录。"})
+            return self._send(200, build_vocab_payload(user["username"]))
         if path == "/api/user/prefs":
             user = self._session_user()
             if not user:

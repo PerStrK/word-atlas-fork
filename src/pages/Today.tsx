@@ -1,7 +1,10 @@
-import { ArrowRight, Flame, Keyboard, Sparkles } from "lucide-react";
+import { ArrowRight, BookMarked, Flame, Keyboard, Sparkles } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { prefetch, useAtlas, useEntry } from "../atlas/context";
+import { useAuth } from "../lib/auth";
 import { go, openWord } from "../lib/router";
+import { refreshVocab, useVocabAtlas } from "../lib/vocab";
+import { senseCoveredBy } from "../lib/senses";
 import { cue } from "../lib/sound";
 import { hashSeed, wordKey } from "../lib/text";
 import { buildSession, masteredCount, todayPlan } from "../store/session";
@@ -154,6 +157,7 @@ export function Today() {
 
       <div className="today-grid">
         <WordOfDay />
+        <VocabPanel />
 
         <section className="panel streak-panel">
           <div className="panel-head">
@@ -197,6 +201,90 @@ export function Today() {
         <Topics />
       </div>
     </div>
+  );
+}
+
+/** Reading-space 生词本: a permanent panel, independent of the active dataset. */
+function VocabPanel() {
+  const { user } = useAuth();
+  const vocab = useVocabAtlas();
+  const progress = useStore((s) => s.progress);
+  const settings = useStore((s) => s.settings);
+  useEffect(() => {
+    if (user) void refreshVocab();
+  }, [user]);
+  if (!user) return null;
+  const active = progress.session && !progress.session.finished ? progress.session : null;
+  const total = vocab?.count ?? 0;
+  const nowMs = Date.now();
+  let learned = 0;
+  let due = 0;
+  if (vocab) {
+    for (const w of vocab.words) {
+      const c = progress.cards[wordKey(w.word)];
+      if (c) {
+        learned++;
+        if (c.due <= nowMs) due++;
+      }
+    }
+  }
+  const startVocab = () => {
+    if (active) {
+      go({ page: "learn" });
+      return;
+    }
+    if (!vocab) return;
+    const dueWords = vocab.words
+      .filter((w) => {
+        const c = progress.cards[wordKey(w.word)];
+        return c && c.due <= nowMs;
+      })
+      .sort((a, b) => progress.cards[wordKey(a.word)].due - progress.cards[wordKey(b.word)].due)
+      .slice(0, 60);
+    const freshWords = vocab.words
+      .filter((w) => !progress.cards[wordKey(w.word)])
+      .slice(0, Math.max(1, settings.dailyNew));
+    const ids = [...dueWords, ...freshWords].map((w) => w.id);
+    if (!ids.length) return;
+    const s = buildSession(vocab, progress, settings, { ids });
+    if (!s.steps.length) return;
+    store.progress((p) => ({ ...p, session: s }));
+    if (settings.sfx) void cue("start");
+    go({ page: "learn" });
+  };
+  return (
+    <section className="panel vocab-panel">
+      <div className="panel-head">
+        <h3 className="eyebrow">
+          <BookMarked size={14} /> 阅读空间 · 生词本
+        </h3>
+        {total > 0 && (
+          <span>
+            共 {total} 词 · 已学 {learned}
+            {due > 0 ? ` · 待复习 ${due}` : ""}
+          </span>
+        )}
+      </div>
+      {total === 0 ? (
+        <p className="muted">
+          在阅读空间读书时查过并收进生词本的词，会自动出现在这里，可以和词库里的词一样学、一样复习——学过的词在所有词库里都算数。
+        </p>
+      ) : (
+        <>
+          <p className="muted">
+            这些词来自你在阅读空间里的阅读，哪个词库都不会把它们切走。学会的词会点亮同一颗星。
+          </p>
+          <div className="journey-actions">
+            <button className="btn btn-primary" onClick={startVocab} disabled={!active && due === 0 && learned === total}>
+              {active ? "先完成当前旅程" : due > 0 ? `复习生词（${due}）` : learned < total ? "学生词本" : "生词都学过了"} <ArrowRight size={17} />
+            </button>
+            <button className="btn btn-glass" onClick={() => go({ page: "atlas", view: "vocab" })}>
+              在图鉴查看
+            </button>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 
@@ -263,6 +351,7 @@ function WordOfDay() {
 function LevelPath() {
   const atlas = useAtlas();
   const cards = useStore((s) => s.progress.cards);
+  const senses = useStore((s) => s.progress.senses);
   const start = useStore((s) => s.settings.startLevel);
   const levels = useMemo(() => {
     const out = atlas.cefr.map((name) => ({ name, total: 0, seen: 0, mastered: 0 }));
@@ -272,11 +361,12 @@ function LevelPath() {
       const c = cards[wordKey(w.word)];
       if (c) {
         l.seen++;
-        if (isMastered(c)) l.mastered++;
+        // Mastered only counts once this dataset's senses are covered too.
+        if (isMastered(c) && senseCoveredBy(senses, atlas.series, w)) l.mastered++;
       }
     }
     return out;
-  }, [atlas, cards]);
+  }, [atlas, cards, senses]);
   const ORDINALS = "一二三四五六七八九";
   const NAMES = atlas.cefr[0]?.includes("Unit")
     ? atlas.cefr.map((name) => {

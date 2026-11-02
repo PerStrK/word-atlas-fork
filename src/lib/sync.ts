@@ -2,6 +2,7 @@ import { emptyProgress, sanitizeProgress, store, GLOBAL_DATASET, type Progress }
 import { wordKey } from "./text";
 import { apiGet, apiPut, auth, fetchRegisterOpen, refreshMe } from "./auth";
 import { applyServerPrefs, datasetsStore } from "./datasets";
+import { ensureSenseBaseline } from "./senses";
 
 interface Meta {
   owner: string | null;
@@ -207,6 +208,7 @@ export async function syncAfterLogin() {
   await applyServerPrefs();
   await mergeLegacyServerRows();
   await syncGlobal();
+  void ensureSenseBaseline();
   if (auth.get().syncState !== "error") auth.setSync("idle");
 }
 
