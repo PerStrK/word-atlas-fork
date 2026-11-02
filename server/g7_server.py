@@ -330,6 +330,9 @@ def init_db():
     CREATE TABLE IF NOT EXISTS user_prefs (
         username TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL,
         PRIMARY KEY (username, key));
+    CREATE TABLE IF NOT EXISTS user_settings (
+        username TEXT PRIMARY KEY, data TEXT NOT NULL,
+        client_ts INTEGER NOT NULL, server_ts INTEGER NOT NULL);
     """)
     conn.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('register_open', '1')")
     for username, password, role in SEED_USERS:
@@ -477,6 +480,18 @@ class H(BaseHTTPRequestHandler):
             if not isinstance(ids, list) or not ids:
                 ids = [DATASET_ID]
             return self._send(200, {"datasets": [str(x) for x in ids]})
+        if path == "/api/user/settings":
+            user = self._session_user()
+            if not user:
+                return self._send(401, {"error": "请先登录。"})
+            conn = db()
+            row = conn.execute("SELECT data, client_ts, server_ts FROM user_settings WHERE username = ?",
+                               (user["username"],)).fetchone()
+            conn.close()
+            if not row:
+                return self._send(200, {"settings": None, "clientTs": 0, "serverTs": 0})
+            return self._send(200, {"settings": json.loads(row["data"]),
+                                    "clientTs": row["client_ts"], "serverTs": row["server_ts"]})
         if path == "/api/settings":
             conn = db()
             row = conn.execute("SELECT value FROM settings WHERE key = 'register_open'").fetchone()
@@ -687,6 +702,24 @@ class H(BaseHTTPRequestHandler):
 
     def do_PUT(self):
         path = urlparse(self.path).path
+        if path == "/api/user/settings":
+            user = self._session_user()
+            if not user:
+                return self._send(401, {"error": "请先登录。"})
+            body = self._body()
+            if body is None:
+                return self._send(413, {"error": "设置数据过大或格式不对。"})
+            settings = body.get("settings")
+            client_ts = int(body.get("clientTs") or 0)
+            if not isinstance(settings, dict):
+                return self._send(400, {"error": "设置数据不合法。"})
+            now = int(time.time() * 1000)
+            conn = db()
+            conn.execute("INSERT OR REPLACE INTO user_settings (username, data, client_ts, server_ts) VALUES (?, ?, ?, ?)",
+                         (user["username"], json.dumps(settings, ensure_ascii=False), client_ts, now))
+            conn.commit()
+            conn.close()
+            return self._send(200, {"serverTs": now, "clientTs": client_ts})
         if path == "/api/user/prefs":
             user = self._session_user()
             if not user:

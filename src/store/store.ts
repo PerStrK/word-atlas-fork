@@ -311,6 +311,13 @@ export const store = {
     markDirty();
     flush();
   },
+  /** Replace local settings with a server copy (cloud sync). */
+  adoptSettings(s: Settings) {
+    state = { ...state, settings: sanitizeSettings(s) };
+    emit();
+    markDirty();
+    flush();
+  },
   progress(fn: (p: Progress) => Progress) {
     state = { ...state, progress: fn(state.progress) };
     emit();

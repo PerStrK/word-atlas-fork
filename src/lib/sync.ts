@@ -1,4 +1,4 @@
-import { emptyProgress, sanitizeProgress, store, GLOBAL_DATASET, type Progress } from "../store/store";
+import { defaultSettings, emptyProgress, sanitizeProgress, store, GLOBAL_DATASET, type Progress, type Settings } from "../store/store";
 import { wordKey } from "./text";
 import { apiGet, apiPut, auth, fetchRegisterOpen, refreshMe } from "./auth";
 import { applyServerPrefs, datasetsStore } from "./datasets";
@@ -201,6 +201,88 @@ async function mergeLegacyServerRows() {
   }
 }
 
+/* ---------- account settings sync: same timestamp-merge pattern as the pool.
+   Settings live only in localStorage otherwise, so without this they reset to
+   defaults on every new device. Meta key reuses the progress meta helpers. */
+const SETTINGS_DS = "__settings";
+let lastSettingsRef: Settings | null = null;
+let settingsUploadTimer: number | undefined;
+let settingsReconciled = false;
+
+function scheduleSettingsUpload() {
+  if (!auth.get().user) return;
+  window.clearTimeout(settingsUploadTimer);
+  settingsUploadTimer = window.setTimeout(() => void uploadSettingsNow(), 1200);
+}
+
+async function uploadSettingsNow() {
+  const user = auth.get().user;
+  if (!user) return;
+  if (!settingsReconciled) {
+    void syncSettings();
+    return;
+  }
+  const meta = readMeta(SETTINGS_DS);
+  if (meta.owner !== user.username) return;
+  if (meta.localTs <= meta.syncedTs) return;
+  try {
+    await apiPut("/user/settings", { settings: store.get().settings, clientTs: meta.localTs });
+    const m2 = readMeta(SETTINGS_DS);
+    if (m2.localTs === meta.localTs) {
+      m2.syncedTs = meta.localTs;
+      writeMeta(SETTINGS_DS, m2);
+    }
+  } catch {
+    /* the next change, login or pagehide retries */
+  }
+}
+
+function adoptServerSettings(settings: Settings, clientTs: number, owner: string) {
+  store.adoptSettings(settings);
+  writeMeta(SETTINGS_DS, { owner, localTs: clientTs, syncedTs: clientTs });
+  lastSettingsRef = store.get().settings;
+}
+
+/** Reconcile account settings with the server copy. */
+export async function syncSettings() {
+  const user = auth.get().user;
+  if (!user) return;
+  const meta = readMeta(SETTINGS_DS);
+  let server: { settings: Settings | null; clientTs: number } = { settings: null, clientTs: 0 };
+  try {
+    const d = await apiGet("/user/settings");
+    server = { settings: d.settings ?? null, clientTs: d.clientTs ?? 0 };
+  } catch {
+    return;
+  }
+  if (meta.owner && meta.owner !== user.username) {
+    // This device holds another account's settings: never upload them here.
+    if (server.settings) adoptServerSettings(server.settings, server.clientTs, user.username);
+    else {
+      writeMeta(SETTINGS_DS, { owner: user.username, localTs: 0, syncedTs: 0 });
+      store.adoptSettings(defaultSettings);
+      lastSettingsRef = store.get().settings;
+    }
+    settingsReconciled = true;
+    return;
+  }
+  meta.owner = user.username;
+  writeMeta(SETTINGS_DS, meta);
+  if (server.settings && server.clientTs > meta.localTs) {
+    adoptServerSettings(server.settings, server.clientTs, user.username);
+  } else if (meta.localTs > server.clientTs) {
+    try {
+      await apiPut("/user/settings", { settings: store.get().settings, clientTs: meta.localTs });
+      const m2 = readMeta(SETTINGS_DS);
+      m2.syncedTs = meta.localTs;
+      writeMeta(SETTINGS_DS, m2);
+    } catch {
+      return;
+    }
+  }
+  settingsReconciled = true;
+}
+
 /** Full post-login sync: account dataset selection, legacy merge, then the pool. */
 export async function syncAfterLogin() {
   const user = auth.get().user;
@@ -208,6 +290,7 @@ export async function syncAfterLogin() {
   await applyServerPrefs();
   await mergeLegacyServerRows();
   await syncGlobal();
+  await syncSettings();
   void ensureSenseBaseline();
   if (auth.get().syncState !== "error") auth.setSync("idle");
 }
@@ -215,6 +298,7 @@ export async function syncAfterLogin() {
 /** Manual "sync now" from the account panel. */
 export async function syncNow() {
   await syncGlobal();
+  await syncSettings();
 }
 
 export function initSync() {
@@ -233,7 +317,27 @@ export function initSync() {
       scheduleUpload();
     }
   });
-  window.addEventListener("pagehide", () => void uploadNow());
+  lastSettingsRef = store.get().settings;
+  store.subscribe(() => {
+    const s = store.get().settings;
+    if (s !== lastSettingsRef) {
+      lastSettingsRef = s;
+      const user = auth.get().user;
+      if (user) {
+        const meta = readMeta(SETTINGS_DS);
+        if (!meta.owner) meta.owner = user.username;
+        if (meta.owner === user.username) {
+          meta.localTs = Date.now();
+          writeMeta(SETTINGS_DS, meta);
+          scheduleSettingsUpload();
+        }
+      }
+    }
+  });
+  window.addEventListener("pagehide", () => {
+    void uploadNow();
+    void uploadSettingsNow();
+  });
   void (async () => {
     await fetchRegisterOpen();
     const u = await refreshMe();
